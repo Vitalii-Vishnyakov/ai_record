@@ -33,6 +33,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Untitled.swift,
 			);
 			target = 9561BA492ED4C57B00883768 /* voice_record_itmo */;
 		};
