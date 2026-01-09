@@ -124,7 +124,7 @@ final class MainViewModel: ObservableObject {
     }
 
     func onRecordTap(id: String) {
-        router?.push(viewController: DetailFactory.getDetailViewController(parentRouter: router))
+        router?.push(viewController: DetailFactory.getDetailViewController(parentRouter: router, itemId: id))
     }
 
     func onNewRecordTap() {

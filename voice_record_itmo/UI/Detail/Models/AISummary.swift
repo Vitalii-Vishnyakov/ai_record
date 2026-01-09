@@ -8,4 +8,9 @@
 struct AISummary {
     let text: String
     let keyWords: [String]
+
+    init(text: String = "", keyWords: [String] = []) {
+        self.text = text
+        self.keyWords = keyWords
+    }
 }

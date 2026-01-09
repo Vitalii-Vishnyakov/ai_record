@@ -8,8 +8,13 @@
 import UIKit
 
 enum DetailFactory {
-    static func getDetailViewController(parentRouter: Router?) -> UIViewController {
-        let viewModel = DetailViewModel(router: parentRouter)
+    @MainActor static func getDetailViewController(parentRouter: Router?, itemId: String) -> UIViewController {
+        let audioManager = FileManagerService()
+        let metaDataManager = MetaDataFileManager()
+        let facade = FileManagerFacade(files: audioManager, metadataStore: metaDataManager)
+        let recordService = RecordingService()
+        
+        let viewModel = DetailViewModel(router: parentRouter, facade: facade, player: recordService, itemId: itemId)
         let viewController = DetailViewController(rootView: DetailView(viewModel: viewModel))
         return viewController
     }

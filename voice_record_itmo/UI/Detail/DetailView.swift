@@ -77,13 +77,19 @@ struct DetailView: View {
                         .frame(height: 6)
                     
                     HStack {
-                        Text(formatTime(viewModel.playback.currentTime))
+                        Text("\(viewModel.playback.currentTime)")
                             .font(.system(size: 14, weight: .regular))
                             .foregroundStyle(Color(.secondaryLabel))
                         
                         Spacer()
                         
-                        Text(formatTime(viewModel.playback.totalTime))
+                        Text(viewModel.playback.dateLine)
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundStyle(Color(.secondaryLabel))
+                        
+                        Spacer()
+                        
+                        Text("\(viewModel.playback.totalTime)")
                             .font(.system(size: 14, weight: .regular))
                             .foregroundStyle(Color(.secondaryLabel))
                     }
@@ -166,9 +172,14 @@ struct DetailView: View {
             }
             
             VStack(alignment: .leading, spacing: 16) {
-                ForEach(viewModel.transcript) { line in
-                    TranscriptRow(time: line.time, text: line.text)
-                }
+//                ForEach(viewModel.transcript) { line in
+//                    TranscriptRow(time: line.time, text: line.text)
+//                }
+                
+                Text(viewModel.transcript)
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundStyle(Color(.label))
+                    .lineSpacing(4)
             }
         }
         .padding(18)
@@ -242,15 +253,6 @@ struct DetailView: View {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .stroke(Color(.systemIndigo).opacity(0.18), lineWidth: 1)
         )
-    }
-    
-    // MARK: - Helpers
-    
-    
-    private func formatTime(_ seconds: Int) -> String {
-        let m = seconds / 60
-        let s = seconds % 60
-        return String(format: "%d:%02d", m, s)
     }
 }
 
@@ -341,10 +343,4 @@ private struct SpeedChip: View {
         }
         .buttonStyle(.plain)
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    DetailView(viewModel: DetailViewModel(router: nil))
 }
