@@ -7,16 +7,16 @@
 
 import Foundation
 
-enum NeuralStatus: Equatable {
-    case warmingUp
-    case loadingModel
-    case processingAudio
-    case transcribing
-    case summarizing
-    case extractingKeywords
-    case idle
-    case done
-    case error
+enum NeuralStatus: Int16, Codable {
+    case idle = 0
+    case warmingUp = 1
+    case loadingModel = 2
+    case processingAudio = 3
+    case transcribing = 4
+    case summarizing = 5
+    case extractingKeywords = 6
+    case done = 7
+    case error = 8
 
     private var localizationKey: String {
         switch self {
