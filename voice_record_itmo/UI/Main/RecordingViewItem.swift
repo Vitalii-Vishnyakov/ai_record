@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RecordingViewItem: Identifiable {
+struct RecordingViewItem: Identifiable, Equatable {
     let id: String
     let title: String
     let dateText: String
@@ -16,4 +16,7 @@ struct RecordingViewItem: Identifiable {
     let isStarred: Bool
     let isTranscribed: Bool
     let isSummurized: Bool
+
+    let audioURL: URL
+    let metadataId: UUID?
 }

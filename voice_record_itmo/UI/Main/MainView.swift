@@ -45,20 +45,39 @@ struct MainView: View {
             }
         }
         .navigationBarHidden(true)
+        .onAppear {
+            viewModel.onAppear()
+        }
     }
     
     // MARK: - Parts
     
     private var header: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(L10n.appTitle.text)
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(Color(.label))
-                
-                Text(L10n.recordingsTitle.text)
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundStyle(Color(.secondaryLabel))
+        HStack(alignment: .top, spacing: 8) {
+            if viewModel.isSearchPresented {
+                TextField("Search...", text: $viewModel.searchText)
+                    .textInputAutocapitalization(.sentences)
+                    .disableAutocorrection(true)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(Color(.systemBackground))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(Color(.separator).opacity(0.6), lineWidth: 1)
+                    )
+            } else {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(L10n.appTitle.text)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundStyle(Color(.label))
+                    
+                    Text(L10n.recordingsTitle.text)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(Color(.secondaryLabel))
+                }
             }
             
             Spacer()
@@ -100,10 +119,4 @@ struct MainView: View {
         }
         .accessibilityLabel("Record")
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    MainView(viewModel: MainViewModel(router: nil))
 }

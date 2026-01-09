@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class MetaDataFileManager {
+final class MetaDataFileManager: MetaDataFileManagerProtocol {
     /// Обёртка над моделью, чтобы легко добавлять версию схемы и миграции.
     struct Envelope<T: Codable>: Codable {
         let schemaVersion: Int

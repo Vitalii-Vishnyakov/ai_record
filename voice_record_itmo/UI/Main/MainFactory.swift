@@ -8,8 +8,13 @@
 import UIKit
 
 enum MainFactory {
-    static func buildMainViewController(parentRouter: Router) -> UIViewController {
-        let viewModel = MainViewModel(router: parentRouter)
+    @MainActor static func buildMainViewController(parentRouter: Router) -> UIViewController {
+        let audioManager = FileManagerService()
+        let metaDataManager = MetaDataFileManager()
+        let facade = FileManagerFacade(files: audioManager, metadataStore: metaDataManager)
+        let recordService = RecordingService()
+        
+        let viewModel = MainViewModel(router: parentRouter, facade: facade, player: recordService)
         let viewController = MainViewController(rootView: MainView(viewModel: viewModel))
         return viewController
     }
