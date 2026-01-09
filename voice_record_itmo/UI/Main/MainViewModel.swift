@@ -16,11 +16,7 @@ final class MainViewModel: ObservableObject {
     @Published var items: [RecordingViewItem] = []
 
     @Published var isSearchPresented: Bool = false
-    @Published var searchText: String = "" {
-        didSet {
-            onSearchTextChanged(searchText)
-        }
-    }
+    @Published var searchText: String = ""
 
     private weak var router: Router?
 

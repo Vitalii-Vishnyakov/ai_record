@@ -32,15 +32,13 @@ struct NewRecordingView: View {
             }
         }
         .onAppear {
-            viewModel.startPulse()
-            viewModel.startTimerIfNeeded()
+            viewModel.onAppear()
         }
         .onDisappear {
-            viewModel.stopTimer()
+            viewModel.onDisappear()
         }
         .navigationBarHidden(true)
     }
-    
     
     private var titleRow: some View {
         ZStack {
@@ -61,14 +59,14 @@ struct NewRecordingView: View {
     private var micPulse: some View {
         ZStack {
             Circle()
-                .fill(Color(.systemIndigo).opacity(viewModel.pulse ? 0.18 : 0.12))
+                .fill(Color(.systemIndigo).opacity(viewModel.isPulsingAnimation ? 0.18 : 0.12))
                 .frame(width: 240, height: 240)
-                .scaleEffect(viewModel.pulse ? 1.08 : 0.92)
+                .scaleEffect(viewModel.isPulsingAnimation ? 1.08 : 0.92)
             
             Circle()
-                .fill(Color(.systemBlue).opacity(viewModel.pulse ? 0.22 : 0.16))
+                .fill(Color(.systemBlue).opacity(viewModel.isPulsingAnimation ? 0.22 : 0.16))
                 .frame(width: 200, height: 200)
-                .scaleEffect(viewModel.pulse ? 1.05 : 0.95)
+                .scaleEffect(viewModel.isPulsingAnimation ? 1.05 : 0.95)
             
             Circle()
                 .fill(
@@ -86,12 +84,12 @@ struct NewRecordingView: View {
                 .foregroundStyle(.white)
         }
         .padding(.top, 4)
-        .animation(.smooth(duration: 2), value: viewModel.pulse)
+        .animation(.smooth(duration: 2), value: viewModel.isPulsingAnimation)
     }
     
     private var timeBlock: some View {
         VStack(spacing: 8) {
-            Text(formatTime(viewModel.elapsedSeconds))
+            Text("\(viewModel.elapsedSeconds)")
                 .font(.system(size: 52, weight: .bold))
                 .foregroundStyle(Color(.label))
             
@@ -139,11 +137,13 @@ struct NewRecordingView: View {
                 systemImage: viewModel.isPaused ? "play.fill" : "pause.fill",
                 size: 64
             ) {
-                
+                withAnimation(.snappy(duration: 0.18)) {
+                    viewModel.onStopContinueTap()
+                }
             }
             
             Button {
-                
+                viewModel.onStopRecordTap()
             } label: {
                 ZStack {
                     Circle()
@@ -164,19 +164,11 @@ struct NewRecordingView: View {
                 size: 64
             ) {
                 withAnimation(.snappy(duration: 0.18)) {
-     
+                    viewModel.onStaredTap()
                 }
             }
         }
         .padding(.top, 4)
-    }
-    
-    // MARK: - Formatting
-    
-    private func formatTime(_ seconds: Int) -> String {
-        let m = seconds / 60
-        let s = seconds % 60
-        return String(format: "%02d:%02d", m, s)
     }
 }
 
@@ -202,13 +194,5 @@ private struct CircleIconButtonLarge: View {
                 )
         }
         .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Preview
-
-#Preview {
-    NavigationStack {
-        NewRecordingView(viewModel: NewRecordingViewModel(router: nil))
     }
 }

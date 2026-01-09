@@ -68,6 +68,9 @@ struct MainView: View {
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
                             .stroke(Color(.separator).opacity(0.6), lineWidth: 1)
                     )
+                    .onChange(of: viewModel.searchText) {
+                        viewModel.onSearchTextChanged($0)
+                    }
             } else {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(L10n.appTitle.text)
@@ -84,6 +87,7 @@ struct MainView: View {
             
             CircleIconButton(systemImage: "magnifyingglass") { viewModel.onSearchTap() }
         }
+        .animation(.smooth, value: viewModel.isSearchPresented)
         .padding(.top, 10)
     }
     

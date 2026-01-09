@@ -8,8 +8,13 @@
 import UIKit
 
 enum NewRecordingFactory {
-    static func getNewRecordingViewController(parentRouter: Router?) -> UIViewController {
-        let viewModel = NewRecordingViewModel(router: parentRouter)
+    @MainActor static func getNewRecordingViewController(parentRouter: Router?) -> UIViewController {
+        let audioManager = FileManagerService()
+        let metaDataManager = MetaDataFileManager()
+        let facade = FileManagerFacade(files: audioManager, metadataStore: metaDataManager)
+        let recordService = RecordingService()
+        
+        let viewModel = NewRecordingViewModel(router: parentRouter, facade: facade, recorder: recordService)
         let viewController = NewRecordingViewController(rootView: NewRecordingView(viewModel: viewModel))
         return viewController
     }
