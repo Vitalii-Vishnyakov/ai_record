@@ -1,0 +1,76 @@
+/* 
+  Localizable.strings
+  voice_record_itmo
+
+  Created by Виталий Вишняков on 9.01.26.
+  
+*/
+
+/* App */
+app.title = "Voice Recorder";
+recordings.title = "Your recordings";
+new.recording.title = "New Recording";
+
+/* Filters */
+filter.all = "All";
+filter.today = "Today";
+filter.this_week = "This Week";
+filter.starred = "Starred";
+
+/* Recording list */
+recording.note = "Note";
+recording.yesterday = "Yesterday";
+recording.recognized = "Transcribed";
+recording.summarized = "Summarized";
+
+/* Player */
+player.play = "Play";
+player.pause = "Pause";
+player.stop = "Stop";
+player.speed = "Speed";
+
+/* Recording screen */
+recording.in_progress = "Recording in progress…";
+recording.paused = "Recording paused...";
+recording.name = "Recording Name";
+recording.name.placeholder = "Enter recording name";
+
+/* Transcript / Summary */
+transcript.full = "Full Transcript";
+summary.title = "Summary";
+ai.summary = "AI Summary";
+copy = "Copy";
+keywords = "Key words";
+
+/* Neural network statuses */
+nn.warming_up = "Warming up model";
+nn.loading_model = "Loading model";
+nn.processing_audio = "Processing audio";
+nn.transcribing = "Transcribing speech";
+nn.summarizing = "Generating summary";
+nn.extracting_keywords = "Extracting key words";
+nn.idle = "Idle";
+nn.done = "Done";
+nn.error = "Processing error";
+
+/* Alerts – delete */
+alert.delete.title = "Delete recording?";
+alert.delete.message = "This recording will be permanently deleted.";
+alert.delete.confirm = "Delete";
+alert.delete.cancel = "Cancel";
+
+/* Alerts – rename */
+alert.rename.title = "Rename recording";
+alert.rename.placeholder = "New name";
+alert.rename.save = "Save";
+alert.rename.cancel = "Cancel";
+
+/* Alerts – exit recording */
+alert.exit_recording.title = "Stop recording?";
+alert.exit_recording.message = "Recording will be stopped.";
+alert.exit_recording.confirm = "Stop";
+alert.exit_recording.cancel = "Continue";
+
+/* Errors */
+error.generic = "Something went wrong";
+error.audio_permission = "Microphone access denied";

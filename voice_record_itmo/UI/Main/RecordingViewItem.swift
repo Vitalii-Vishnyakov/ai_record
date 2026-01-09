@@ -8,11 +8,12 @@
 import Foundation
 
 struct RecordingViewItem: Identifiable {
-    let id: String = UUID().uuidString
+    let id: String
     let title: String
     let dateText: String
-    let words: Int
-    let language: String
+    let duration: Int
     let progress: Double
     let isStarred: Bool
+    let isTranscribed: Bool
+    let isSummurized: Bool
 }

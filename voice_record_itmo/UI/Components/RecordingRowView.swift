@@ -9,9 +9,8 @@ import SwiftUI
 
 struct RecordingRowView: View {
     let item: RecordingViewItem
-    let onPlay: () -> Void
-    let onEdit: () -> Void
-    let onDelete: () -> Void
+    let onPlay: (String) -> Void
+    let onStared: (String) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -29,16 +28,17 @@ struct RecordingRowView: View {
                 
                 Spacer()
                 
-                if item.isStarred {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Color(.systemYellow))
-                        .padding(.top, 2)
-                }
+                Image(systemName: "star.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color(item.isStarred ? .systemYellow : .systemGray4))
+                    .padding(.top, 2)
+                    .onTapGesture {
+                        onStared(item.id)
+                    }
             }
             
             HStack(spacing: 12) {
-                Button(action: onPlay) {
+                Button(action: { onPlay(item.id) }) {
                     ZStack {
                         Circle()
                             .fill(Color(.systemBlue).opacity(0.15))
@@ -59,13 +59,21 @@ struct RecordingRowView: View {
             }
             
             HStack(spacing: 10) {
-                MetaPill(systemImage: "doc.text", text: "\(formatWords(item.words)) words")
-                MetaPill(systemImage: "globe", text: item.language)
+                if item.isTranscribed {
+                    MetaPill(
+                        systemImage: "text.viewfinder",
+                        text: L10n.recordingRecognized.text
+                    )
+                }
+                
+                if item.isSummurized {
+                    MetaPill(systemImage: "text.redaction", text: L10n.recordingSummarized.text)
+                }
                 
                 Spacer()
                 
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Color(.systemGreen))
+                    .foregroundStyle(Color(item.isTranscribed && item.isSummurized ? .systemGreen : .systemYellow))
             }
         }
         .padding(14)
@@ -75,17 +83,6 @@ struct RecordingRowView: View {
                 .shadow(color: Color.black.opacity(0.06), radius: 10, x: 0, y: 6)
         )
         .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(action: onDelete) {
-                Label("Delete", systemImage: "trash.fill")
-            }
-            .tint(Color(.systemRed))
-            
-            Button(action: onEdit) {
-                Label("Edit", systemImage: "pencil")
-            }
-            .tint(Color(.systemOrange))
-        }
     }
     
     private func formatWords(_ value: Int) -> String {

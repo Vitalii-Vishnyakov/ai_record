@@ -11,36 +11,40 @@ struct MainView: View {
     @StateObject var viewModel: MainViewModel
     
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
+        VStack(spacing: .zero) {
+            AIModelStatus(neuralStatus: viewModel.neuralStatue)
+            
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     
                     header
-                
+                    
                     filterChips
                     
                     VStack(spacing: 12) {
                         ForEach(viewModel.filteredItems) { item in
                             RecordingRowView(
                                 item: item,
-                                onPlay: { /* play */ },
-                                onEdit: { /* edit */ },
-                                onDelete: { delete(item) }
+                                onPlay: { viewModel.onPlayPauseTap(id: $0) },
+                                onStared: { viewModel.onStaredTap(id: $0) }
                             )
+                            .onTapGesture {
+                                viewModel.onRecordTap(id: item.id)
+                            }
                         }
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 92) // space for floating button + tabbar
+                .padding(.bottom, 92)
             }
-            
-            recordButton
-                .padding(.trailing, 18)
-                .padding(.bottom, 18)
+            .background(Color(.systemGroupedBackground))
+            .overlay(alignment: .bottomTrailing) {
+                recordButton
+                    .padding(.trailing, 18)
+                    .padding(.bottom, 18)
+            }
         }
         .navigationBarHidden(true)
-        .background(Color(.systemGroupedBackground))
-        
     }
     
     // MARK: - Parts
@@ -48,25 +52,22 @@ struct MainView: View {
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Voice Recorder")
+                Text(L10n.appTitle.text)
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(Color(.label))
                 
-                Text("Your recordings")
+                Text(L10n.recordingsTitle.text)
                     .font(.system(size: 14, weight: .regular))
                     .foregroundStyle(Color(.secondaryLabel))
             }
             
             Spacer()
             
-            HStack(spacing: 10) {
-                CircleIconButton(systemImage: "magnifyingglass") { }
-                CircleIconButton(systemImage: "ellipsis") { }
-            }
+            CircleIconButton(systemImage: "magnifyingglass") { viewModel.onSearchTap() }
         }
         .padding(.top, 10)
     }
-        
+    
     private var filterChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
@@ -75,7 +76,7 @@ struct MainView: View {
                         title: f.title,
                         isSelected: viewModel.selectedFilter == f
                     ) {
-                        withAnimation(.snappy(duration: 0.18)) { viewModel.selectedFilter = f }
+                        withAnimation(.snappy(duration: 0.18)) { viewModel.onChipTap(filter: f) }
                     }
                 }
             }
@@ -85,7 +86,7 @@ struct MainView: View {
     
     private var recordButton: some View {
         Button {
-            // start recording
+            viewModel.onNewRecordTap()
         } label: {
             Image(systemName: "mic.fill")
                 .font(.system(size: 18, weight: .bold))
@@ -99,17 +100,10 @@ struct MainView: View {
         }
         .accessibilityLabel("Record")
     }
-    
-    
-    private func delete(_ item: RecordingViewItem) {
-        withAnimation(.snappy) {
-            viewModel.items.removeAll { $0.id == item.id }
-        }
-    }
 }
 
 // MARK: - Preview
 
 #Preview {
-    MainView(viewModel: MainViewModel())
+    MainView(viewModel: MainViewModel(router: nil))
 }

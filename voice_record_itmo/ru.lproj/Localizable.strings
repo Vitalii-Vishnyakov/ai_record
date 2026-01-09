@@ -1,0 +1,76 @@
+/* 
+  Localizable.strings
+  voice_record_itmo
+
+  Created by Виталий Вишняков on 9.01.26.
+  
+*/
+
+/* App */
+app.title = "Диктофон";
+recordings.title = "Ваши записи";
+new.recording.title = "Новая запись";
+
+/* Filters */
+filter.all = "Все";
+filter.today = "Сегодня";
+filter.this_week = "На этой неделе";
+filter.starred = "Избранное";
+
+/* Recording list */
+recording.note = "Заметка";
+recording.yesterday = "Вчера";
+recording.recognized = "Распознано";
+recording.summarized = "Суммаризировано";
+
+/* Player */
+player.play = "Воспроизвести";
+player.pause = "Пауза";
+player.stop = "Стоп";
+player.speed = "Скорость";
+
+/* Recording screen */
+recording.in_progress = "Идёт запись…";
+recording.paused = "Запись остановлена...";
+recording.name = "Название записи";
+recording.name.placeholder = "Введите название записи";
+
+/* Transcript / Summary */
+transcript.full = "Полная расшифровка";
+summary.title = "Сводка";
+ai.summary = "AI-сводка";
+copy = "Копировать";
+keywords = "Ключевые слова";
+
+/* Neural network statuses */
+nn.warming_up = "Прогрев модели";
+nn.loading_model = "Загрузка модели";
+nn.processing_audio = "Обработка аудио";
+nn.transcribing = "Распознавание речи";
+nn.summarizing = "Создание сводки";
+nn.extracting_keywords = "Извлечение ключевых слов";
+nn.idle = "Ожидание";
+nn.done = "Готово";
+nn.error = "Ошибка обработки";
+
+/* Alerts – delete */
+alert.delete.title = "Удалить запись?";
+alert.delete.message = "Запись будет удалена без возможности восстановления.";
+alert.delete.confirm = "Удалить";
+alert.delete.cancel = "Отмена";
+
+/* Alerts – rename */
+alert.rename.title = "Переименовать запись";
+alert.rename.placeholder = "Новое название";
+alert.rename.save = "Сохранить";
+alert.rename.cancel = "Отмена";
+
+/* Alerts – exit recording */
+alert.exit_recording.title = "Завершить запись?";
+alert.exit_recording.message = "Запись будет остановлена.";
+alert.exit_recording.confirm = "Завершить";
+alert.exit_recording.cancel = "Продолжить";
+
+/* Errors */
+error.generic = "Произошла ошибка";
+error.audio_permission = "Нет доступа к микрофону";

@@ -8,8 +8,8 @@
 import UIKit
 
 enum NewRecordingFactory {
-    static func getNewRecordingViewController() -> UIViewController {
-        let viewModel = NewRecordingViewModel()
+    static func getNewRecordingViewController(parentRouter: Router?) -> UIViewController {
+        let viewModel = NewRecordingViewModel(router: parentRouter)
         let viewController = NewRecordingViewController(rootView: NewRecordingView(viewModel: viewModel))
         return viewController
     }

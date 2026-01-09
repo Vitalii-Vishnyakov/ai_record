@@ -7,17 +7,17 @@
 
 import UIKit
 
-protocol Router {
+protocol Router: NSObject {
     func push(viewController: UIViewController)
     func pop()
 }
 
-extension UIViewController: Router {
+extension UINavigationController: Router {
     func push(viewController: UIViewController) {
-        navigationController?.pushViewController(viewController, animated: true)
+        pushViewController(viewController, animated: true)
     }
     
     func pop() {
-        navigationController?.popViewController(animated: true)
+        popViewController(animated: true)
     }
 }

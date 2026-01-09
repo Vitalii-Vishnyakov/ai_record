@@ -8,8 +8,8 @@
 import UIKit
 
 enum MainFactory {
-    static func buildMainViewController() -> UIViewController {
-        let viewModel = MainViewModel()
+    static func buildMainViewController(parentRouter: Router) -> UIViewController {
+        let viewModel = MainViewModel(router: parentRouter)
         let viewController = MainViewController(rootView: MainView(viewModel: viewModel))
         return viewController
     }

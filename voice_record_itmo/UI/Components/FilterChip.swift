@@ -13,12 +13,13 @@ enum Filter: CaseIterable, Identifiable {
     var id: String {
         title
     }
+    
     var title: String {
         switch self {
-        case .all: return "All"
-        case .today: return "Today"
-        case .thisWeek: return "This Week"
-        case .starred: return "Starred"
+        case .all: return L10n.filterAll.text
+        case .today: return L10n.filterToday.text
+        case .thisWeek: return L10n.filterThisWeek.text
+        case .starred: return L10n.filterStarred.text
         }
     }
 }
