@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AIModelStatus: View {
     let neuralStatus: NeuralStatus
+    let currentProgress: Double
     
     var body: some View {
         HStack(spacing: .zero) {
@@ -21,6 +22,13 @@ struct AIModelStatus: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .background(backgroundColor)
+        .overlay(alignment: .bottomLeading) {
+            Rectangle()
+                .fill(Color.blue.opacity(0.5))
+                .frame(width: UIScreen.main.bounds.width * currentProgress, height: 4)
+        }
+        .animation(.smooth, value: currentProgress)
+        .animation(.smooth, value: neuralStatus)
     }
     
     var backgroundColor: Color {
@@ -28,15 +36,17 @@ struct AIModelStatus: View {
         case .warmingUp:
             Color(.systemGray4)
         case .loadingModel:
-            Color(.systemGray3)
+            Color(.systemGray4)
         case .processingAudio:
-            Color(.systemYellow)
+            Color(.systemGray3)
+            
         case .transcribing:
-            Color(.green)
+            Color(.systemGreen)
         case .summarizing:
             Color(.systemGreen)
         case .extractingKeywords:
-            Color(.systemIndigo)
+            Color(.systemGreen)
+            
         case .idle:
             Color(.systemGray2)
         case .done:

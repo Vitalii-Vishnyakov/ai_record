@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import Combine
 
 @MainActor
 final class MainViewModel: ObservableObject {
 
     @Published var filteredItems: [RecordingViewItem] = []
-    @Published var neuralStatue: NeuralStatus = .idle
+    @Published var neuralStatus: NeuralStatus = .idle
+    @Published var currentStatusProgress: Double = .zero
     @Published var selectedFilter: Filter = .all
     @Published var items: [RecordingViewItem] = []
 
@@ -27,6 +29,8 @@ final class MainViewModel: ObservableObject {
     private var bundles: [RecordingBundle] = []
     private var currentlyPlayingId: String?
     private var progressTimer: Timer?
+    
+    private var bag = Set<AnyCancellable>()
 
     init(
         router: Router?,
@@ -46,10 +50,15 @@ final class MainViewModel: ObservableObject {
                 self?.rebuildItemsKeepingPlayState()
             }
         }
+        
+        Task(priority: .userInitiated) {
+            try await AiFacade.shared.loadModels()
+        }
     }
 
     func onAppear() {
         reload()
+        bindAI()
     }
 
     func reload() {
@@ -160,6 +169,17 @@ final class MainViewModel: ObservableObject {
     }
 
     // MARK: - Private
+
+    private func bindAI() {
+        AiFacade.shared.progressSubject
+            .share()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] ev in
+                self?.neuralStatus = mapStageToNeuralStatus(ev.stage)
+                self?.currentStatusProgress = ev.fraction
+            }
+            .store(in: &bag)
+    }
 
     private var isPlayerPlaying: Bool {
         if case .playing = player.state { return true }

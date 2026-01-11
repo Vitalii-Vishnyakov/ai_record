@@ -16,9 +16,11 @@ enum RecordingServiceError: LocalizedError {
     case noPlayer
     case invalidURL
     case invalidTime
+    case microphonePermissionDenied
 
     var errorDescription: String? {
         switch self {
+        case .microphonePermissionDenied: return "Mic denied"
         case .audioSession(let e): return "AudioSession error: \(e.localizedDescription)"
         case .recorderInit(let e): return "Recorder init error: \(e.localizedDescription)"
         case .recorderStartFailed: return "Не удалось начать запись"

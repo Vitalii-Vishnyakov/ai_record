@@ -4,7 +4,6 @@
 //
 //  Created by Виталий Вишняков on 7.01.26.
 //
-
 import Foundation
 import AVFoundation
 
@@ -38,18 +37,18 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
         guard fileURL.isFileURL else { throw RecordingServiceError.invalidURL }
 
         stopPlaybackIfNeeded()
+        try requestMicPermissionIfNeeded()
 
         do {
-            try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
-            try session.setActive(true)
+            try activateSessionForRecording()
         } catch {
-            logger.error("AudioSession setCategory/setActive failed: \(error)")
+            logger.error("AudioSession activate(record) failed: \(error)")
             throw RecordingServiceError.audioSession(error)
         }
 
         let defaultSettings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 44_100,
+            AVSampleRateKey: 48_000,
             AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
@@ -85,6 +84,14 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
     func resumeRecording() throws {
         guard let recorder else { throw RecordingServiceError.noRecorder }
         guard state == .pausedRecording else { return }
+
+        do {
+            try activateSessionForRecording()
+        } catch {
+            logger.error("AudioSession re-activate(record) failed: \(error)")
+            throw RecordingServiceError.audioSession(error)
+        }
+
         recorder.record()
         setState(.recording)
         logger.info("Recording resumed")
@@ -94,7 +101,6 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
         guard let recorder else { throw RecordingServiceError.noRecorder }
         recorder.stop()
         logger.info("Recording stop requested")
-        // состояние перейдёт в idle в delegate
     }
 
     func currentRecordingTime() throws -> TimeInterval {
@@ -116,10 +122,9 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
         stopRecordingIfNeeded()
 
         do {
-            try session.setCategory(.playback, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
-            try session.setActive(true)
+            try activateSessionForPlayback()
         } catch {
-            logger.error("AudioSession setCategory/setActive failed: \(error)")
+            logger.error("AudioSession activate(playback) failed: \(error)")
             throw RecordingServiceError.audioSession(error)
         }
 
@@ -138,6 +143,13 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
 
     func play() throws {
         guard let player else { throw RecordingServiceError.noPlayer }
+
+        do {
+            try activateSessionForPlayback()
+        } catch {
+            logger.error("AudioSession activate(playback) failed: \(error)")
+            throw RecordingServiceError.audioSession(error)
+        }
 
         let ok = player.play()
         if ok {
@@ -162,6 +174,7 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
         player.currentTime = 0
         setState(.idle)
         logger.info("Playback stopped")
+        deactivateSessionIfIdle()
     }
 
     func duration() throws -> TimeInterval {
@@ -194,6 +207,79 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
         logger.info("Playback rate set to \(clamped)x")
     }
 
+    // MARK: - AudioSession (FIX)
+
+    private func activateSessionForRecording() throws {
+        try runOnMainSync {
+            try session.setCategory(
+                .playAndRecord,
+                mode: .spokenAudio,
+                options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP]
+            )
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
+        }
+    }
+
+    private func activateSessionForPlayback() throws {
+        try runOnMainSync {
+            try session.setCategory(
+                .playback,
+                mode: .spokenAudio,
+                options: [.allowBluetooth, .allowBluetoothA2DP]
+            )
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
+        }
+    }
+
+    private func deactivateSessionIfIdle() {
+        guard recorder == nil, player == nil else { return }
+        runOnMainAsync {
+            do {
+                try self.session.setActive(false, options: .notifyOthersOnDeactivation)
+                self.logger.debug("AudioSession deactivated (idle)")
+            } catch {
+                self.logger.warning("AudioSession deactivation failed: \(error)")
+            }
+        }
+    }
+
+    private func requestMicPermissionIfNeeded() throws {
+        let perm = session.recordPermission
+        switch perm {
+        case .granted:
+            return
+        case .denied:
+            throw RecordingServiceError.microphonePermissionDenied
+        case .undetermined:
+            let sema = DispatchSemaphore(value: 0)
+            var granted = false
+            session.requestRecordPermission { ok in
+                granted = ok
+                sema.signal()
+            }
+            sema.wait()
+            if !granted {
+                throw RecordingServiceError.microphonePermissionDenied
+            }
+        @unknown default:
+            throw RecordingServiceError.microphonePermissionDenied
+        }
+    }
+
+    private func runOnMainAsync(_ block: @escaping () -> Void) {
+        if Thread.isMainThread { block(); return }
+        DispatchQueue.main.async(execute: block)
+    }
+
+    private func runOnMainSync<T>(_ block: () throws -> T) throws -> T {
+        if Thread.isMainThread { return try block() }
+        var result: Result<T, Error>!
+        DispatchQueue.main.sync {
+            result = Result { try block() }
+        }
+        return try result.get()
+    }
+
     // MARK: - Internals
 
     private func setState(_ newState: RecordingState) {
@@ -210,6 +296,7 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
             self.player = nil
             setState(.idle)
             logger.debug("Playback stopped (auto)")
+            deactivateSessionIfIdle()
         }
     }
 
@@ -219,6 +306,7 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
             self.recorder = nil
             setState(.idle)
             logger.debug("Recording stopped (auto)")
+            deactivateSessionIfIdle()
         }
     }
 }
@@ -230,22 +318,29 @@ extension RecordingService: AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         let url = flag ? recorder.url : nil
         self.recorder = nil
         setState(.idle)
+        deactivateSessionIfIdle()
         onFinishRecording?(url)
     }
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         logger.info("Player finished. success=\(flag)")
+        self.player = nil
         setState(.idle)
+        deactivateSessionIfIdle()
         onFinishPlayback?()
     }
 
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         logger.error("Player decode error: \(String(describing: error))")
+        self.player = nil
         setState(.idle)
+        deactivateSessionIfIdle()
     }
 
     func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
         logger.error("Recorder encode error: \(String(describing: error))")
+        self.recorder = nil
         setState(.idle)
+        deactivateSessionIfIdle()
     }
 }

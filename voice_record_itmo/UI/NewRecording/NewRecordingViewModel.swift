@@ -7,16 +7,18 @@
 
 import Foundation
 import AVFoundation
+import Combine
 
 @MainActor
 final class NewRecordingViewModel: ObservableObject {
 
-    @Published var neuralStatue: NeuralStatus = .idle
+    @Published var neuralStatus: NeuralStatus = .idle
 
     @Published var elapsedSeconds: Int = 0
     @Published var isPaused: Bool = false
     @Published var isBookmarked: Bool = false
     @Published var recordingName: String = ""
+    @Published var currentStatusProgress: Double = .zero
 
     @Published var isPulsingAnimation: Bool = false
     
@@ -33,6 +35,8 @@ final class NewRecordingViewModel: ObservableObject {
 
     private var startedAt: Date?
     private let calendar: Calendar
+    
+    private var bag = Set<AnyCancellable>()
 
     init(
         router: Router?,
@@ -50,7 +54,7 @@ final class NewRecordingViewModel: ObservableObject {
                 guard let self else { return }
                 self.stopAllTimers()
                 self.isPulsingAnimation = false
-                self.neuralStatue = .idle
+                self.neuralStatus = .idle
                 self.isPaused = false
 
                 if let url {
@@ -65,11 +69,13 @@ final class NewRecordingViewModel: ObservableObject {
 
     func onAppear() {
         startNewRecording()
+        bindAI()
     }
 
     func onDisappear() {
         // если пользователь ушёл с экрана — не продолжаем таймеры
         stopAllTimers()
+        bag.removeAll()
     }
 
     func goGack() {
@@ -104,13 +110,24 @@ final class NewRecordingViewModel: ObservableObject {
     }
 
     // MARK: - Recording
+    
+    private func bindAI() {
+        AiFacade.shared.progressSubject
+            .share()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] ev in
+                self?.neuralStatus = mapStageToNeuralStatus(ev.stage)
+                self?.currentStatusProgress = ev.fraction
+            }
+            .store(in: &bag)
+    }
 
     private func startNewRecording() {
         elapsedSeconds = 0
         isPaused = false
         isBookmarked = false
         recordingName = ""
-        neuralStatue = .idle
+        neuralStatus = .idle
 
         do {
             let created = try facade.createRecording(

@@ -12,7 +12,7 @@ struct MainView: View {
     
     var body: some View {
         VStack(spacing: .zero) {
-            AIModelStatus(neuralStatus: viewModel.neuralStatue)
+            AIModelStatus(neuralStatus: viewModel.neuralStatus, currentProgress: viewModel.currentStatusProgress)
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {

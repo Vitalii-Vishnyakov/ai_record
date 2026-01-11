@@ -46,7 +46,7 @@ actor WhisperService {
     private let defaultLanguage: String
     private let verbose: Bool
 
-    init(defaultLanguage: String = "ru", verbose: Bool = false) {
+    init(defaultLanguage: String = "ru", verbose: Bool = true) {
         self.defaultLanguage = defaultLanguage
         self.verbose = verbose
     }

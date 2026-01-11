@@ -14,7 +14,7 @@ struct DetailView: View {
     
     var body: some View {
         VStack(spacing: .zero) {
-            AIModelStatus(neuralStatus: viewModel.neuralStatue)
+            AIModelStatus(neuralStatus: viewModel.neuralStatus, currentProgress: viewModel.currentStatusProgress)
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
@@ -30,6 +30,12 @@ struct DetailView: View {
             }
         }
         .navigationBarHidden(true)
+        .onAppear {
+            viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
     }
     
     private var header: some View {
@@ -40,6 +46,15 @@ struct DetailView: View {
                 }
                 
                 Spacer()
+                
+                CircleIconButton(systemImage: "trash") {
+                    
+                }
+                
+                CircleIconButton(systemImage: "doc.append") {
+                    viewModel.onGetTranscriptionAndSummarizationTap()
+                }
+                .disabled(!viewModel.isAiActionEnabled)
                 
                 CircleIconButton(systemImage: "square.and.arrow.up") { viewModel.onShareTap() }
             }
