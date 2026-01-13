@@ -37,6 +37,9 @@ struct MainView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 92)
             }
+            .refreshable {
+                viewModel.reload()
+            }
             .background(Color(.systemGroupedBackground))
             .overlay(alignment: .bottomTrailing) {
                 recordButton

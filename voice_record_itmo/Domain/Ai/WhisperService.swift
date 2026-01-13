@@ -170,65 +170,11 @@ actor WhisperService {
         deliverOnMainActor: Bool,
         progress: ProgressHandler?
     ) async throws -> URL {
-        let targetSampleRate: Double = 16_000
-        let targetChannels: AVAudioChannelCount = 1
 
         let tmp = FileManager.default.temporaryDirectory
         let outURL = tmp.appendingPathComponent("whisper_\(UUID().uuidString)").appendingPathExtension("wav")
-
-        let inFile = try AVAudioFile(forReading: inputURL)
-        let inFormat = inFile.processingFormat
-
-        guard let outFormat = AVAudioFormat(
-            commonFormat: .pcmFormatFloat32,
-            sampleRate: targetSampleRate,
-            channels: targetChannels,
-            interleaved: false
-        ) else {
-            throw ServiceError.preprocessFailed("Не удалось создать output format")
-        }
-
-        guard let converter = AVAudioConverter(from: inFormat, to: outFormat) else {
-            throw ServiceError.preprocessFailed("Не удалось создать AVAudioConverter")
-        }
-
-        let outFile = try AVAudioFile(forWriting: outURL, settings: outFormat.settings)
-
-        let inCap: AVAudioFrameCount = 8192
-        guard let inBuffer = AVAudioPCMBuffer(pcmFormat: inFormat, frameCapacity: inCap) else {
-            throw ServiceError.preprocessFailed("Не удалось создать input buffer")
-        }
-
-        let outCap: AVAudioFrameCount = 8192
-        guard let outBuffer = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: outCap) else {
-            throw ServiceError.preprocessFailed("Не удалось создать output buffer")
-        }
-
-        let totalFrames = max(1, Int64(inFile.length))
-        var processed: Int64 = 0
-
-        while true {
-            try inFile.read(into: inBuffer)
-            if inBuffer.frameLength == 0 { break }
-
-            var err: NSError?
-            let status = converter.convert(to: outBuffer, error: &err) { _, outStatus in
-                outStatus.pointee = .haveData
-                return inBuffer
-            }
-
-            if status == .error {
-                throw ServiceError.preprocessFailed(err?.localizedDescription ?? "convert error")
-            }
-
-            try outFile.write(from: outBuffer)
-
-            processed += Int64(outBuffer.frameLength)
-            outBuffer.frameLength = 0
-
-            let frac = min(1.0, Double(processed) / Double(totalFrames))
-            try await emit(progress, deliverOnMainActor, .init(kind: .preprocessing, fraction: frac, message: "Конвертация \(Int(frac * 100))%"))
-        }
+        
+        try await AudioConverter.convertToWav16kMono(inputURL: inputURL, outputURL: outURL)
 
         return outURL
     }

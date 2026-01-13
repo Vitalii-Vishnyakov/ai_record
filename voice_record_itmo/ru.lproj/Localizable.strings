@@ -50,7 +50,7 @@ nn.transcribing = "Распознавание речи";
 nn.summarizing = "Создание сводки";
 nn.extracting_keywords = "Извлечение ключевых слов";
 nn.idle = "Ожидание";
-nn.done = "Готово";
+nn.done = "Жду следующей задачи";
 nn.error = "Ошибка обработки";
 
 /* Alerts – delete */

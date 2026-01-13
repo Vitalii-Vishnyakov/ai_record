@@ -59,11 +59,9 @@ final class DetailViewModel: ObservableObject {
     }
     
     func onGetTranscriptionAndSummarizationTap() {
-        if metadata == nil, let audio = bundle?.audio.audioURL {
+        if let audio = bundle?.audio.audioURL {
             Task { [weak self] in
                 do {
-                    try await AiFacade.shared.loadModels()
-                    
                     let result = try await AiFacade.shared.transcribeAndSummarize(
                         audioURL: audio
                     )
@@ -73,6 +71,7 @@ final class DetailViewModel: ObservableObject {
                         text: result.summary,
                         keyWords: ["какие", "то", "слова"] // если позже добавишь keywords из LLM
                     )
+                    self?.saveSummaryIfPossible()
                 } catch {
                     self?.neuralStatus = .error
                 }
@@ -365,6 +364,37 @@ final class DetailViewModel: ObservableObject {
             transcript: m.transcript,
             summary: m.summary,
             keywords: m.keywords,
+            neuralStatus: m.neuralStatus,
+            neuralErrorMessage: m.neuralErrorMessage,
+            modelName: m.modelName,
+            modelVersion: m.modelVersion
+        )
+        
+        do {
+            try facade.updateMetadata(m)
+            metadata = m
+        } catch { }
+    }
+    
+    private func saveSummaryIfPossible() {
+        guard var m = metadata else { return }
+        
+        m = RecordingMetadata(
+            id: m.id,
+            title: m.title,
+            note: m.note,
+            isStarred: m.isStarred,
+            createdAt: m.createdAt,
+            updatedAt: Date(),
+            relativePath: m.relativePath,
+            fileExt: m.fileExt,
+            fileSizeBytes: m.fileSizeBytes,
+            durationSec: m.durationSec,
+            lastPlaybackPositionSec: m.lastPlaybackPositionSec,
+            playbackRate: Float(playback.speed),
+            transcript: transcript,
+            summary: summary.text,
+            keywords: summary.keyWords,
             neuralStatus: m.neuralStatus,
             neuralErrorMessage: m.neuralErrorMessage,
             modelName: m.modelName,

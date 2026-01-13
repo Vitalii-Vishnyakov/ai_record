@@ -54,7 +54,7 @@ struct DetailView: View {
                 CircleIconButton(systemImage: "doc.append") {
                     viewModel.onGetTranscriptionAndSummarizationTap()
                 }
-                .disabled(!viewModel.isAiActionEnabled)
+             //   .disabled(!viewModel.isAiActionEnabled)
                 
                 CircleIconButton(systemImage: "square.and.arrow.up") { viewModel.onShareTap() }
             }

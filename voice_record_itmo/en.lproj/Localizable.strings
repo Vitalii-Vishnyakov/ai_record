@@ -50,7 +50,7 @@ nn.transcribing = "Transcribing speech";
 nn.summarizing = "Generating summary";
 nn.extracting_keywords = "Extracting key words";
 nn.idle = "Idle";
-nn.done = "Done";
+nn.done = "Wait for next task;)";
 nn.error = "Processing error";
 
 /* Alerts – delete */
