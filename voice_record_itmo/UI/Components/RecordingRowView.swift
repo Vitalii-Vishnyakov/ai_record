@@ -44,7 +44,7 @@ struct RecordingRowView: View {
                             .fill(Color(.systemBlue).opacity(0.15))
                             .frame(width: 44, height: 44)
                         
-                        Image(systemName: "play.fill")
+                        Image(systemName: item.isPlaying ? "pause.fill" : "play.fill")
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color(.systemBlue))
                             .padding(.leading, 2)

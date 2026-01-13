@@ -224,8 +224,8 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
         try runOnMainSync {
             try session.setCategory(
                 .playback,
-                mode: .spokenAudio,
-                options: [.allowBluetooth, .allowBluetoothA2DP]
+                mode: .default,
+                options: []
             )
             try session.setActive(true, options: .notifyOthersOnDeactivation)
         }

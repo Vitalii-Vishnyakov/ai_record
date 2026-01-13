@@ -90,9 +90,15 @@ final class MainViewModel: ObservableObject {
                 if isPlayerPlaying {
                     try player.pausePlayback()
                     stopProgressTimer()
+                    if let index = filteredItems.firstIndex(where: { $0.id == id }) {
+                        filteredItems[index].isPlaying = false
+                    }
                 } else {
                     try player.play()
                     startProgressTimer()
+                    if let index = filteredItems.firstIndex(where: { $0.id == id }) {
+                        filteredItems[index].isPlaying = true
+                    }
                 }
                 return
             }
@@ -289,6 +295,7 @@ final class MainViewModel: ObservableObject {
             isStarred: b.isStarred,
             isTranscribed: isTranscribed,
             isSummurized: isSummurized,
+            isPlaying: false,
             audioURL: b.audio.audioURL,
             metadataId: b.metadata?.id
         )
@@ -339,6 +346,7 @@ final class MainViewModel: ObservableObject {
                 isStarred: old.isStarred,
                 isTranscribed: old.isTranscribed,
                 isSummurized: old.isSummurized,
+                isPlaying: old.isPlaying,
                 audioURL: old.audioURL,
                 metadataId: old.metadataId
             )

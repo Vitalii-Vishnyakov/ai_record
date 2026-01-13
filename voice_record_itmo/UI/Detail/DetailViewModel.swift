@@ -138,7 +138,7 @@ final class DetailViewModel: ObservableObject {
         try player.preparePlayback(from: audioURL)
         
         // Если есть мета — восстановим позицию
-        if let m = metadata, m.lastPlaybackPositionSec > 0 {
+        if let m = metadata, m.lastPlaybackPositionSec > 0, m.lastPlaybackPositionSec < m.durationSec - 10 {
             try? player.seek(to: m.lastPlaybackPositionSec)
         }
         
