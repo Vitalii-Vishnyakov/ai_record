@@ -9,22 +9,24 @@
 /* Begin PBXBuildFile section */
 		957AC0DA2F0D2E6200CCCF2F /* qwen2.5-1.5b-instruct-q4_k_m.gguf in Resources */ = {isa = PBXBuildFile; fileRef = 957AC0D92F0D2E6200CCCF2F /* qwen2.5-1.5b-instruct-q4_k_m.gguf */; };
 		957AC0DF2F0D3FED00CCCF2F /* LlamaSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 957AC0DE2F0D3FED00CCCF2F /* LlamaSwift */; };
-		95C765B32ED6F60100F544A0 /* AudioEncoder.mlmodelc in Resources */ = {isa = PBXBuildFile; fileRef = 95C765AD2ED6F60100F544A0 /* AudioEncoder.mlmodelc */; };
-		95C765B42ED6F60100F544A0 /* TextDecoder.mlmodelc in Resources */ = {isa = PBXBuildFile; fileRef = 95C765B12ED6F60100F544A0 /* TextDecoder.mlmodelc */; };
-		95C765B52ED6F60100F544A0 /* generation_config.json in Resources */ = {isa = PBXBuildFile; fileRef = 95C765AF2ED6F60100F544A0 /* generation_config.json */; };
-		95C765B62ED6F60100F544A0 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 95C765AE2ED6F60100F544A0 /* config.json */; };
-		95C765B72ED6F60100F544A0 /* MelSpectrogram.mlmodelc in Resources */ = {isa = PBXBuildFile; fileRef = 95C765B02ED6F60100F544A0 /* MelSpectrogram.mlmodelc */; };
+		958A0B672F1BB1980085D4E4 /* AudioEncoder.mlmodelc in Resources */ = {isa = PBXBuildFile; fileRef = 958A0B602F1BB1980085D4E4 /* AudioEncoder.mlmodelc */; };
+		958A0B682F1BB1980085D4E4 /* generation_config.json in Resources */ = {isa = PBXBuildFile; fileRef = 958A0B622F1BB1980085D4E4 /* generation_config.json */; };
+		958A0B692F1BB1980085D4E4 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 958A0B612F1BB1980085D4E4 /* config.json */; };
+		958A0B6A2F1BB1980085D4E4 /* TextDecoderContextPrefill.mlmodelc in Resources */ = {isa = PBXBuildFile; fileRef = 958A0B652F1BB1980085D4E4 /* TextDecoderContextPrefill.mlmodelc */; };
+		958A0B6B2F1BB1980085D4E4 /* TextDecoder.mlmodelc in Resources */ = {isa = PBXBuildFile; fileRef = 958A0B642F1BB1980085D4E4 /* TextDecoder.mlmodelc */; };
+		958A0B6C2F1BB1980085D4E4 /* MelSpectrogram.mlmodelc in Resources */ = {isa = PBXBuildFile; fileRef = 958A0B632F1BB1980085D4E4 /* MelSpectrogram.mlmodelc */; };
 		95FDBB0C2ED62A0500CCA154 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 95FDBB0B2ED62A0500CCA154 /* WhisperKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9561BA4A2ED4C57B00883768 /* voice_record_itmo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = voice_record_itmo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		957AC0D92F0D2E6200CCCF2F /* qwen2.5-1.5b-instruct-q4_k_m.gguf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "qwen2.5-1.5b-instruct-q4_k_m.gguf"; sourceTree = "<group>"; };
-		95C765AD2ED6F60100F544A0 /* AudioEncoder.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AudioEncoder.mlmodelc; sourceTree = "<group>"; };
-		95C765AE2ED6F60100F544A0 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
-		95C765AF2ED6F60100F544A0 /* generation_config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = generation_config.json; sourceTree = "<group>"; };
-		95C765B02ED6F60100F544A0 /* MelSpectrogram.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = MelSpectrogram.mlmodelc; sourceTree = "<group>"; };
-		95C765B12ED6F60100F544A0 /* TextDecoder.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = TextDecoder.mlmodelc; sourceTree = "<group>"; };
+		958A0B602F1BB1980085D4E4 /* AudioEncoder.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AudioEncoder.mlmodelc; sourceTree = "<group>"; };
+		958A0B612F1BB1980085D4E4 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
+		958A0B622F1BB1980085D4E4 /* generation_config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = generation_config.json; sourceTree = "<group>"; };
+		958A0B632F1BB1980085D4E4 /* MelSpectrogram.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = MelSpectrogram.mlmodelc; sourceTree = "<group>"; };
+		958A0B642F1BB1980085D4E4 /* TextDecoder.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = TextDecoder.mlmodelc; sourceTree = "<group>"; };
+		958A0B652F1BB1980085D4E4 /* TextDecoderContextPrefill.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = TextDecoderContextPrefill.mlmodelc; sourceTree = "<group>"; };
 		95C766202ED761F400F544A0 /* memory.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = memory.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -65,7 +67,7 @@
 		9561BA412ED4C57B00883768 = {
 			isa = PBXGroup;
 			children = (
-				95C765B22ED6F60100F544A0 /* openai_whisper-small */,
+				958A0B662F1BB1980085D4E4 /* openai_whisper-large-v2_turbo_955MB */,
 				9561BA4C2ED4C57B00883768 /* voice_record_itmo */,
 				9561BA4B2ED4C57B00883768 /* Products */,
 				95C766202ED761F400F544A0 /* memory.entitlements */,
@@ -81,16 +83,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		95C765B22ED6F60100F544A0 /* openai_whisper-small */ = {
+		958A0B662F1BB1980085D4E4 /* openai_whisper-large-v2_turbo_955MB */ = {
 			isa = PBXGroup;
 			children = (
-				95C765AD2ED6F60100F544A0 /* AudioEncoder.mlmodelc */,
-				95C765AE2ED6F60100F544A0 /* config.json */,
-				95C765AF2ED6F60100F544A0 /* generation_config.json */,
-				95C765B02ED6F60100F544A0 /* MelSpectrogram.mlmodelc */,
-				95C765B12ED6F60100F544A0 /* TextDecoder.mlmodelc */,
+				958A0B602F1BB1980085D4E4 /* AudioEncoder.mlmodelc */,
+				958A0B612F1BB1980085D4E4 /* config.json */,
+				958A0B622F1BB1980085D4E4 /* generation_config.json */,
+				958A0B632F1BB1980085D4E4 /* MelSpectrogram.mlmodelc */,
+				958A0B642F1BB1980085D4E4 /* TextDecoder.mlmodelc */,
+				958A0B652F1BB1980085D4E4 /* TextDecoderContextPrefill.mlmodelc */,
 			);
-			path = "openai_whisper-small";
+			path = "openai_whisper-large-v2_turbo_955MB";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -165,11 +168,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				957AC0DA2F0D2E6200CCCF2F /* qwen2.5-1.5b-instruct-q4_k_m.gguf in Resources */,
-				95C765B32ED6F60100F544A0 /* AudioEncoder.mlmodelc in Resources */,
-				95C765B42ED6F60100F544A0 /* TextDecoder.mlmodelc in Resources */,
-				95C765B52ED6F60100F544A0 /* generation_config.json in Resources */,
-				95C765B62ED6F60100F544A0 /* config.json in Resources */,
-				95C765B72ED6F60100F544A0 /* MelSpectrogram.mlmodelc in Resources */,
+				958A0B672F1BB1980085D4E4 /* AudioEncoder.mlmodelc in Resources */,
+				958A0B682F1BB1980085D4E4 /* generation_config.json in Resources */,
+				958A0B692F1BB1980085D4E4 /* config.json in Resources */,
+				958A0B6A2F1BB1980085D4E4 /* TextDecoderContextPrefill.mlmodelc in Resources */,
+				958A0B6B2F1BB1980085D4E4 /* TextDecoder.mlmodelc in Resources */,
+				958A0B6C2F1BB1980085D4E4 /* MelSpectrogram.mlmodelc in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
