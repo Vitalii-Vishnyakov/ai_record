@@ -44,14 +44,6 @@ final class MainViewModel: ObservableObject {
         self.player = player
         self.calendar = calendar
 
-        self.player.onFinishPlayback = { [weak self] in
-            Task { @MainActor in
-                self?.stopProgressTimer()
-                self?.currentlyPlayingId = nil
-                self?.rebuildItemsKeepingPlayState()
-            }
-        }
-
         syncAIStatusWithCurrentEvent()
         
         Task(priority: .userInitiated) {
@@ -62,6 +54,10 @@ final class MainViewModel: ObservableObject {
     func onAppear() {
         reload()
         bindAI()
+    }
+
+    func onDisappear() {
+        stopProgressTimer()
     }
 
     func reload() {
@@ -87,39 +83,38 @@ final class MainViewModel: ObservableObject {
 
     func onPlayPauseTap(id: String) {
         guard let item = items.first(where: { $0.id == id }) else { return }
+        syncPlayingStateFromPlayer(applyFilters: false)
 
         do {
             if currentlyPlayingId == id {
                 if isPlayerPlaying {
                     try player.pausePlayback()
                     stopProgressTimer()
-                    if let index = filteredItems.firstIndex(where: { $0.id == id }) {
-                        filteredItems[index].isPlaying = false
-                    }
                 } else {
+                    if player.currentPlaybackURL != item.audioURL {
+                        try player.preparePlayback(from: item.audioURL)
+                        applySavedPlaybackContext(for: id)
+                    }
                     try player.play()
                     startProgressTimer()
-                    if let index = filteredItems.firstIndex(where: { $0.id == id }) {
-                        filteredItems[index].isPlaying = true
-                    }
                 }
-                return
+            } else {
+                stopProgressTimer()
+                try? player.stopPlayback()
+
+                try player.preparePlayback(from: item.audioURL)
+                applySavedPlaybackContext(for: id)
+                try player.play()
+
+                currentlyPlayingId = id
+                startProgressTimer()
             }
-
-            stopProgressTimer()
-            try? player.stopPlayback()
-
-            try player.preparePlayback(from: item.audioURL)
-            try player.play()
-
-            currentlyPlayingId = id
-            startProgressTimer()
         } catch {
             stopProgressTimer()
             currentlyPlayingId = nil
         }
 
-        rebuildItemsKeepingPlayState()
+        syncPlayingStateFromPlayer(applyFilters: true)
     }
 
     func onStaredTap(id: String) {
@@ -210,7 +205,45 @@ final class MainViewModel: ObservableObject {
 
     private func rebuildItemsKeepingPlayState() {
         items = bundles.map { mapBundleToItem($0) }
+        syncPlayingStateFromPlayer(applyFilters: false)
         applyCurrentMode()
+    }
+
+    private func applySavedPlaybackContext(for itemId: String) {
+        guard let meta = bundle(for: itemId)?.metadata else { return }
+        if meta.durationSec > 0, meta.lastPlaybackPositionSec > 0, meta.lastPlaybackPositionSec < meta.durationSec {
+            try? player.seek(to: meta.lastPlaybackPositionSec)
+        }
+        if meta.playbackRate > 0 {
+            try? player.setPlaybackRate(meta.playbackRate)
+        }
+    }
+
+    private func syncPlayingStateFromPlayer(applyFilters: Bool) {
+        let activeId = playbackIdForCurrentPlayer()
+        currentlyPlayingId = activeId
+
+        let playingId = isPlayerPlaying ? activeId : nil
+        for idx in items.indices {
+            items[idx].isPlaying = (items[idx].id == playingId)
+        }
+
+        if let _ = playingId {
+            if progressTimer == nil {
+                startProgressTimer()
+            }
+        } else {
+            stopProgressTimer()
+        }
+
+        if applyFilters {
+            applyCurrentMode()
+        }
+    }
+
+    private func playbackIdForCurrentPlayer() -> String? {
+        guard let activeURL = player.currentPlaybackURL else { return nil }
+        return items.first(where: { $0.audioURL == activeURL })?.id
     }
 
     private func applyCurrentMode() {
@@ -260,8 +293,12 @@ final class MainViewModel: ObservableObject {
             }
         }
 
+        let itemsById = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
         // Порядок сохраняем как в bundles (sortNewestFirst уже учтён)
-        return matchedBundles.map { mapBundleToItem($0) }
+        return matchedBundles.map { bundle in
+            let id = bundle.metadata?.id.uuidString ?? bundle.audio.id
+            return itemsById[id] ?? mapBundleToItem(bundle)
+        }
     }
 
     private func tokenize(_ text: String) -> [String] {
@@ -340,7 +377,9 @@ final class MainViewModel: ObservableObject {
     }
 
     private func tickProgress() {
+        syncPlayingStateFromPlayer(applyFilters: false)
         guard let playingId = currentlyPlayingId else { return }
+        guard isPlayerPlaying else { return }
         guard let idx = items.firstIndex(where: { $0.id == playingId }) else { return }
 
         do {
@@ -368,7 +407,9 @@ final class MainViewModel: ObservableObject {
             if let metaId = old.metadataId {
                 try savePlaybackPosition(metaId: metaId, position: t, duration: d)
             }
-        } catch { }
+        } catch {
+            syncPlayingStateFromPlayer(applyFilters: true)
+        }
     }
 
     private func savePlaybackPosition(metaId: UUID, position: TimeInterval, duration: TimeInterval) throws {

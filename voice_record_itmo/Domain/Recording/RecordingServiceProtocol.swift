@@ -11,6 +11,7 @@ import AVFoundation
 protocol RecordingServiceProtocol: AnyObject {
 
     var state: RecordingState { get }
+    var currentPlaybackURL: URL? { get }
     var onStateChange: ((RecordingState) -> Void)? { get set }
     var onFinishPlayback: (() -> Void)? { get set }
     var onFinishRecording: ((URL?) -> Void)? { get set }

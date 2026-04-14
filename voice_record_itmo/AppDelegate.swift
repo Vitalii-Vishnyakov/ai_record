@@ -27,3 +27,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
+enum AppDependencies {
+    static let fileManagerService = FileManagerService()
+    static let metaDataManager = MetaDataFileManager()
+    static let facade: FileManagerFacadeProtocol = FileManagerFacade(
+        files: fileManagerService,
+        metadataStore: metaDataManager
+    )
+    static let recordingService = RecordingService()
+}

@@ -51,6 +51,9 @@ struct MainView: View {
         .onAppear {
             viewModel.onAppear()
         }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
     }
     
     // MARK: - Parts

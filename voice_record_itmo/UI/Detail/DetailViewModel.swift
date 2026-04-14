@@ -48,15 +48,6 @@ final class DetailViewModel: ObservableObject {
         self.player = player
         self.itemId = itemId
         self.calendar = calendar
-        
-        self.player.onFinishPlayback = { [weak self] in
-            Task { @MainActor in
-                self?.stopTimer()
-                self?.playback.isPlaying = false
-                self?.playback.currentTime = 0
-                self?.playback.progress = 0
-            }
-        }
 
         syncAIStatusWithCurrentEvent()
     }
@@ -88,12 +79,14 @@ final class DetailViewModel: ObservableObject {
     }
     
     func onDisappear() {
+        saveProgressIfPossible()
         stopTimer()
         bag.removeAll()
         isAIBound = false
     }
     
     func onGoBack() {
+        saveProgressIfPossible()
         stopTimer()
         try? player.stopPlayback()
         router?.pop()
@@ -129,6 +122,7 @@ final class DetailViewModel: ObservableObject {
             // Подготовим плеер и установим позицию
             try preparePlayerIfPossible()
             syncPlaybackFromPlayer()
+            syncPlaybackBindingFromPlayer()
             
         } catch {
             // можно показать ошибку
@@ -137,6 +131,13 @@ final class DetailViewModel: ObservableObject {
     
     private func preparePlayerIfPossible() throws {
         guard let audioURL = bundle?.audio.audioURL else { return }
+        if player.currentPlaybackURL == audioURL {
+            if playback.speed > 0 {
+                try? player.setPlaybackRate(Float(playback.speed))
+            }
+            return
+        }
+
         try player.preparePlayback(from: audioURL)
         
         // Если есть мета — восстановим позицию
@@ -199,7 +200,7 @@ final class DetailViewModel: ObservableObject {
     // MARK: - Playback controls
     
     func onPlayPauseTap() {
-        guard bundle != nil else { return }
+        guard let audioURL = bundle?.audio.audioURL else { return }
         
         do {
             if playback.isPlaying {
@@ -209,7 +210,7 @@ final class DetailViewModel: ObservableObject {
                 saveProgressIfPossible()
             } else {
                 // Если плеер не подготовлен (например после ошибки) — попробуем ещё раз
-                if !isPlayerReady {
+                if player.currentPlaybackURL != audioURL || !isPlayerReady {
                     try preparePlayerIfPossible()
                 }
                 try player.setPlaybackRate(Float(playback.speed))
@@ -218,6 +219,7 @@ final class DetailViewModel: ObservableObject {
                 startTimer()
             }
             syncPlaybackFromPlayer()
+            syncPlaybackBindingFromPlayer()
         } catch {
             playback.isPlaying = false
             stopTimer()
@@ -296,6 +298,7 @@ final class DetailViewModel: ObservableObject {
     
     private func tick() {
         syncPlaybackFromPlayer()
+        syncPlaybackBindingFromPlayer()
         // не пишем в json каждую 0.35с. Лучше редко.
         // Поэтому сохраняем раз в несколько секунд:
         throttledSaveProgress()
@@ -320,7 +323,34 @@ final class DetailViewModel: ObservableObject {
             playback.totalTime = Int(total.rounded())
             playback.progress = total > 0 ? max(0, min(1, current / total)) : 0
         } catch {
-            // ignore
+            if !isCurrentBundlePreparedInPlayer {
+                playback.isPlaying = false
+            }
+        }
+    }
+
+    private var isCurrentBundlePreparedInPlayer: Bool {
+        guard let audioURL = bundle?.audio.audioURL else { return false }
+        return player.currentPlaybackURL == audioURL
+    }
+
+    private func syncPlaybackBindingFromPlayer() {
+        guard isCurrentBundlePreparedInPlayer else {
+            playback.isPlaying = false
+            stopTimer()
+            return
+        }
+
+        if case .playing = player.state {
+            playback.isPlaying = true
+            if timer == nil {
+                startTimer()
+            }
+        } else {
+            playback.isPlaying = false
+            if timer != nil {
+                stopTimer()
+            }
         }
     }
     

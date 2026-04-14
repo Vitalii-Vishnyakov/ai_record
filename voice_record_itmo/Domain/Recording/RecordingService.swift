@@ -14,6 +14,7 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
     private var player: AVAudioPlayer?
 
     private(set) var state: RecordingState = .idle
+    private(set) var currentPlaybackURL: URL?
     private var logger: RecordingServiceLogger
 
     var onStateChange: ((RecordingState) -> Void)?
@@ -120,6 +121,7 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
         guard fileURL.isFileURL else { throw RecordingServiceError.invalidURL }
 
         stopRecordingIfNeeded()
+        stopPreparedPlaybackIfNeeded()
 
         do {
             try activateSessionForPlayback()
@@ -134,6 +136,7 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
             p.enableRate = true
             p.prepareToPlay()
             player = p
+            currentPlaybackURL = fileURL
             logger.info("Playback prepared: \(fileURL.lastPathComponent)")
         } catch {
             logger.error("Player init failed: \(error)")
@@ -172,6 +175,7 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
         guard let player else { throw RecordingServiceError.noPlayer }
         player.stop()
         player.currentTime = 0
+        currentPlaybackURL = nil
         setState(.idle)
         logger.info("Playback stopped")
         deactivateSessionIfIdle()
@@ -294,10 +298,22 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
             player.stop()
             player.currentTime = 0
             self.player = nil
+            currentPlaybackURL = nil
             setState(.idle)
             logger.debug("Playback stopped (auto)")
             deactivateSessionIfIdle()
         }
+    }
+
+    private func stopPreparedPlaybackIfNeeded() {
+        guard let player else { return }
+        player.stop()
+        player.currentTime = 0
+        self.player = nil
+        currentPlaybackURL = nil
+        setState(.idle)
+        logger.debug("Playback context replaced")
+        deactivateSessionIfIdle()
     }
 
     private func stopRecordingIfNeeded() {
@@ -325,6 +341,7 @@ extension RecordingService: AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         logger.info("Player finished. success=\(flag)")
         self.player = nil
+        currentPlaybackURL = nil
         setState(.idle)
         deactivateSessionIfIdle()
         onFinishPlayback?()
@@ -333,6 +350,7 @@ extension RecordingService: AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         logger.error("Player decode error: \(String(describing: error))")
         self.player = nil
+        currentPlaybackURL = nil
         setState(.idle)
         deactivateSessionIfIdle()
     }
