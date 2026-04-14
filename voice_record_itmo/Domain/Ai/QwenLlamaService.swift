@@ -103,8 +103,16 @@ actor QwenLlamaService {
         }
         defer { llama_free(ctx) }
 
-        let system = loc("ai.qwen.prompt.system")
-        let user = locf("ai.qwen.prompt.user_template", text)
+        let system = """
+        Ты помощник по суммаризации.
+        Всегда отвечай только на русском языке. Тебе дадут транскрибацию речи. В ней могут быть опечатки. Исправь опечатки и далее выполни задание.
+        """
+        let user = """
+        Суммаризируй текст в нескольких кратких пунктах, без воды.
+
+        Текст:
+        \(text)
+        """
         let prompt = chatML(system: system, user: user)
 
         let promptTokens = try tokenize(prompt, vocab: vocab)

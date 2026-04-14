@@ -91,7 +91,11 @@ struct MainView: View {
             
             Spacer()
             
-            CircleIconButton(systemImage: "magnifyingglass") { viewModel.onSearchTap() }
+            CircleIconButton(
+                systemImage: viewModel.isSearchPresented ? "xmark" : "magnifyingglass"
+            ) {
+                viewModel.onSearchTap()
+            }
         }
         .animation(.smooth, value: viewModel.isSearchPresented)
         .padding(.top, 10)

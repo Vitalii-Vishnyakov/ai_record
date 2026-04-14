@@ -300,16 +300,26 @@ final class DetailViewModel: ObservableObject {
     // MARK: - Copy
     
     func copyTap() {
-        let textToCopy: String
         switch tab {
         case .summary:
-            textToCopy = summary.text
+            copySummaryTap()
         case .transcript:
-            textToCopy = transcript
+            copyTranscriptTap()
         }
-        
-        guard !textToCopy.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        UIPasteboard.general.string = textToCopy
+    }
+
+    func copyTranscriptTap() {
+        copyText(transcript)
+    }
+
+    func copySummaryTap() {
+        copyText(summary.text)
+    }
+
+    private func copyText(_ text: String) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        UIPasteboard.general.string = trimmed
     }
     
     // MARK: - Timer

@@ -197,7 +197,7 @@ struct DetailView: View {
                 Spacer()
                 
                 Button(L10n.copy.text) {
-                    viewModel.copyTap()
+                    viewModel.copyTranscriptTap()
                 }
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(Color(.systemBlue))
@@ -240,7 +240,7 @@ struct DetailView: View {
                 Spacer()
                 
                 Button(L10n.copy.text) {
-                    viewModel.copyTap()
+                    viewModel.copySummaryTap()
                 }
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(Color(.systemBlue))
@@ -250,19 +250,6 @@ struct DetailView: View {
                 .font(.system(size: 18))
                 .foregroundStyle(Color(.label))
                 .lineSpacing(4)
-            
-            HStack(spacing: 10) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Color(.systemGreen))
-                
-                Text(L10n.keywords.text)
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(Color(.label))
-            }
-            .padding(.top, 2)
-            
-            TagCloudView(tags: viewModel.summary.keyWords)
          
         }
         .padding(18)

@@ -47,7 +47,7 @@ final class AiFacade {
     private let qwen: QwenLlamaService
 
     private init(
-        whisper: WhisperService = WhisperService(defaultLanguage: "ru", verbose: false),
+        whisper: WhisperService = WhisperService(defaultLanguage: "ru", verbose: true),
         qwen: QwenLlamaService = QwenLlamaService()
     ) {
         self.whisper = whisper
