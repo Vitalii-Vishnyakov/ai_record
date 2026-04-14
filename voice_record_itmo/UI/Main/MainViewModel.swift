@@ -29,6 +29,7 @@ final class MainViewModel: ObservableObject {
     private var bundles: [RecordingBundle] = []
     private var currentlyPlayingId: String?
     private var progressTimer: Timer?
+    private var isAIBound = false
     
     private var bag = Set<AnyCancellable>()
 
@@ -50,6 +51,8 @@ final class MainViewModel: ObservableObject {
                 self?.rebuildItemsKeepingPlayState()
             }
         }
+
+        syncAIStatusWithCurrentEvent()
         
         Task(priority: .userInitiated) {
             try await AiFacade.shared.loadModels()
@@ -177,14 +180,23 @@ final class MainViewModel: ObservableObject {
     // MARK: - Private
 
     private func bindAI() {
+        guard !isAIBound else { return }
+        isAIBound = true
+        syncAIStatusWithCurrentEvent()
+
         AiFacade.shared.progressSubject
-            .share()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] ev in
                 self?.neuralStatus = mapStageToNeuralStatus(ev.stage)
                 self?.currentStatusProgress = ev.fraction
             }
             .store(in: &bag)
+    }
+
+    private func syncAIStatusWithCurrentEvent() {
+        let event = AiFacade.shared.progressSubject.value
+        neuralStatus = mapStageToNeuralStatus(event.stage)
+        currentStatusProgress = event.fraction
     }
 
     private var isPlayerPlaying: Bool {
@@ -439,4 +451,3 @@ final class MainViewModel: ObservableObject {
         )
     }
 }
-

@@ -41,7 +41,7 @@ final class AiFacade {
 
     static let shared = AiFacade()
 
-    let progressSubject = PassthroughSubject<ProgressEvent, Never>()
+    let progressSubject = CurrentValueSubject<ProgressEvent, Never>(.init(stage: .idle, fraction: 0, message: ""))
 
     private let whisper: WhisperService
     private let qwen: QwenLlamaService

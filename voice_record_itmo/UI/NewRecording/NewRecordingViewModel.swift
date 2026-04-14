@@ -35,6 +35,7 @@ final class NewRecordingViewModel: ObservableObject {
 
     private var startedAt: Date?
     private let calendar: Calendar
+    private var isAIBound = false
     
     private var bag = Set<AnyCancellable>()
 
@@ -54,7 +55,6 @@ final class NewRecordingViewModel: ObservableObject {
                 guard let self else { return }
                 self.stopAllTimers()
                 self.isPulsingAnimation = false
-                self.neuralStatus = .idle
                 self.isPaused = false
 
                 if let url {
@@ -63,6 +63,8 @@ final class NewRecordingViewModel: ObservableObject {
                 }
             }
         }
+
+        syncAIStatusWithCurrentEvent()
     }
 
     // MARK: - Lifecycle
@@ -76,6 +78,7 @@ final class NewRecordingViewModel: ObservableObject {
         // если пользователь ушёл с экрана — не продолжаем таймеры
         stopAllTimers()
         bag.removeAll()
+        isAIBound = false
     }
 
     func goGack() {
@@ -112,8 +115,11 @@ final class NewRecordingViewModel: ObservableObject {
     // MARK: - Recording
     
     private func bindAI() {
+        guard !isAIBound else { return }
+        isAIBound = true
+        syncAIStatusWithCurrentEvent()
+
         AiFacade.shared.progressSubject
-            .share()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] ev in
                 self?.neuralStatus = mapStageToNeuralStatus(ev.stage)
@@ -127,7 +133,6 @@ final class NewRecordingViewModel: ObservableObject {
         isPaused = false
         isBookmarked = false
         recordingName = ""
-        neuralStatus = .idle
 
         do {
             let created = try facade.createRecording(
@@ -178,6 +183,12 @@ final class NewRecordingViewModel: ObservableObject {
             isPulsingAnimation = false
             isPaused = false
         }
+    }
+
+    private func syncAIStatusWithCurrentEvent() {
+        let event = AiFacade.shared.progressSubject.value
+        neuralStatus = mapStageToNeuralStatus(event.stage)
+        currentStatusProgress = event.fraction
     }
 
     private func pauseRecording() {

@@ -32,6 +32,7 @@ final class DetailViewModel: ObservableObject {
     
     private let calendar: Calendar
     private var timer: Timer?
+    private var isAIBound = false
     
     private var bag = Set<AnyCancellable>()
     
@@ -56,6 +57,8 @@ final class DetailViewModel: ObservableObject {
                 self?.playback.progress = 0
             }
         }
+
+        syncAIStatusWithCurrentEvent()
     }
     
     func onGetTranscriptionAndSummarizationTap() {
@@ -73,7 +76,7 @@ final class DetailViewModel: ObservableObject {
                     )
                     self?.saveSummaryIfPossible()
                 } catch {
-                    self?.neuralStatus = .error
+                    // Статус ошибки приходит из общего AiFacade.progressSubject.
                 }
             }
         }
@@ -87,6 +90,7 @@ final class DetailViewModel: ObservableObject {
     func onDisappear() {
         stopTimer()
         bag.removeAll()
+        isAIBound = false
     }
     
     func onGoBack() {
@@ -120,7 +124,6 @@ final class DetailViewModel: ObservableObject {
                 keyWords: b.metadata?.keywords ?? []
             )
             
-            neuralStatus = b.metadata?.neuralStatus ?? .idle
             playback.speed = Double(b.metadata?.playbackRate ?? 1.0)
             
             // Подготовим плеер и установим позицию
@@ -170,15 +173,27 @@ final class DetailViewModel: ObservableObject {
     }
     
     private func bindAI() {
+        guard !isAIBound else { return }
+        isAIBound = true
+        syncAIStatusWithCurrentEvent()
+
         AiFacade.shared.progressSubject
-            .share()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] ev in
-                self?.neuralStatus = mapStageToNeuralStatus(ev.stage)
+                let status = mapStageToNeuralStatus(ev.stage)
+                self?.neuralStatus = status
                 self?.currentStatusProgress = ev.fraction
-                self?.isAiActionEnabled = self?.neuralStatus != .loadingModel
+                self?.isAiActionEnabled = status != .loadingModel
             }
             .store(in: &bag)
+    }
+
+    private func syncAIStatusWithCurrentEvent() {
+        let event = AiFacade.shared.progressSubject.value
+        let status = mapStageToNeuralStatus(event.stage)
+        neuralStatus = status
+        currentStatusProgress = event.fraction
+        isAiActionEnabled = status != .loadingModel
     }
     
     // MARK: - Playback controls
