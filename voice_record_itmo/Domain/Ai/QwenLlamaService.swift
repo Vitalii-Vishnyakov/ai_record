@@ -55,7 +55,7 @@ actor QwenLlamaService {
         isLoadingModel = true
         defer { isLoadingModel = false }
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 0.01, message: "Инициализация backend"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 0.01, message: loc("ai.qwen.progress.initializing_backend")))
 
         llama_backend_init()
 
@@ -63,20 +63,24 @@ actor QwenLlamaService {
             forResource: "qwen2.5-1.5b-instruct-q4_k_m",
             withExtension: "gguf"
         ) else {
-            throw NSError(domain: "LLM", code: 100, userInfo: [NSLocalizedDescriptionKey: "Model not found in bundle"])
+            throw NSError(domain: "LLM", code: 100, userInfo: [NSLocalizedDescriptionKey: loc("ai.qwen.error.model_not_found_in_bundle")])
         }
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 0.10, message: "Чтение модели"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 0.10, message: loc("ai.qwen.progress.reading_model")))
 
         let mp = llama_model_default_params()
         guard let m = llama_model_load_from_file(url.path, mp) else {
-            throw NSError(domain: "LLM", code: 101, userInfo: [NSLocalizedDescriptionKey: "Failed to load model at: \(url.path)"])
+            throw NSError(
+                domain: "LLM",
+                code: 101,
+                userInfo: [NSLocalizedDescriptionKey: locf("ai.qwen.error.failed_to_load_model_at", url.path)]
+            )
         }
 
         self.model = m
         self.vocab = llama_model_get_vocab(m)
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 1.0, message: "Модель загружена"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 1.0, message: loc("ai.qwen.progress.model_loaded")))
     }
 
     func summarize(
@@ -85,27 +89,31 @@ actor QwenLlamaService {
         progress: LlamaProgressHandler? = nil
     ) async throws -> String {
         guard let model, let vocab else {
-            throw NSError(domain: "LLM", code: 10, userInfo: [NSLocalizedDescriptionKey: "Model not loaded"])
+            throw NSError(domain: "LLM", code: 10, userInfo: [NSLocalizedDescriptionKey: loc("ai.qwen.error.model_not_loaded")])
         }
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .tokenizing, fraction: 0.0, message: "Подготовка промпта"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .tokenizing, fraction: 0.0, message: loc("ai.qwen.progress.preparing_prompt")))
 
         var cp = llama_context_default_params()
         cp.n_ctx = UInt32(nCtx)
         cp.n_batch = UInt32(nBatch)
 
         guard let ctx = llama_init_from_model(model, cp) else {
-            throw NSError(domain: "LLM", code: 11, userInfo: [NSLocalizedDescriptionKey: "Failed to create context"])
+            throw NSError(domain: "LLM", code: 11, userInfo: [NSLocalizedDescriptionKey: loc("ai.qwen.error.failed_to_create_context")])
         }
         defer { llama_free(ctx) }
 
-        let system = "Ты помощник. Делай короткое точное резюме."
-        let user = "Суммаризируй текст в нескольких пунктах, без воды:\n\n\(text)"
+        let system = loc("ai.qwen.prompt.system")
+        let user = locf("ai.qwen.prompt.user_template", text)
         let prompt = chatML(system: system, user: user)
 
         let promptTokens = try tokenize(prompt, vocab: vocab)
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .tokenizing, fraction: 1.0, message: "Токены: \(promptTokens.count)"))
+        try await emit(
+            progress,
+            deliverOnMainActor,
+            .init(kind: .tokenizing, fraction: 1.0, message: locf("ai.qwen.progress.tokens_count", promptTokens.count))
+        )
 
         let nCur = try await evalPromptInChunks(
             ctx: ctx,
@@ -114,7 +122,7 @@ actor QwenLlamaService {
             progress: progress
         )
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .generating, fraction: 0.0, message: "Генерация ответа"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .generating, fraction: 0.0, message: loc("ai.qwen.progress.generating_response")))
 
         var out = ""
         var curPos = nCur
@@ -124,7 +132,7 @@ actor QwenLlamaService {
 
         for i in 0..<maxNewTokens {
             guard let logits = llama_get_logits(ctx) else {
-                throw NSError(domain: "LLM", code: 20, userInfo: [NSLocalizedDescriptionKey: "Failed to get logits"])
+                throw NSError(domain: "LLM", code: 20, userInfo: [NSLocalizedDescriptionKey: loc("ai.qwen.error.failed_to_get_logits")])
             }
 
             let next = sampleNextToken(vocab: vocab, logits: logits)
@@ -143,11 +151,15 @@ actor QwenLlamaService {
             curPos += 1
 
             guard llama_decode(ctx, batch) == 0 else {
-                throw NSError(domain: "LLM", code: 21, userInfo: [NSLocalizedDescriptionKey: "llama_decode(next) failed"])
+                throw NSError(domain: "LLM", code: 21, userInfo: [NSLocalizedDescriptionKey: loc("ai.qwen.error.decode_next_failed")])
             }
 
             let frac = Double(i + 1) / Double(maxNewTokens)
-            try await emit(progress, deliverOnMainActor, .init(kind: .generating, fraction: frac, message: "Токены: \(i + 1)/\(maxNewTokens)"))
+            try await emit(
+                progress,
+                deliverOnMainActor,
+                .init(kind: .generating, fraction: frac, message: locf("ai.qwen.progress.tokens_progress", i + 1, maxNewTokens))
+            )
 
             if out.contains("<|im_end|>") { break }
         }
@@ -156,7 +168,7 @@ actor QwenLlamaService {
             .replacingOccurrences(of: "<|im_end|>", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .done, fraction: 1.0, message: "Готово"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .done, fraction: 1.0, message: loc("ai.qwen.progress.done")))
 
         return cleaned
     }
@@ -204,7 +216,7 @@ actor QwenLlamaService {
         )
 
         if n <= 0 {
-            throw NSError(domain: "LLM", code: 12, userInfo: [NSLocalizedDescriptionKey: "Tokenization failed"])
+            throw NSError(domain: "LLM", code: 12, userInfo: [NSLocalizedDescriptionKey: loc("ai.qwen.error.tokenization_failed")])
         }
 
         return Array(tokens.prefix(Int(n)))
@@ -243,14 +255,18 @@ actor QwenLlamaService {
             }
 
             guard llama_decode(ctx, batch) == 0 else {
-                throw NSError(domain: "LLM", code: 13, userInfo: [NSLocalizedDescriptionKey: "llama_decode(prompt chunk) failed"])
+                throw NSError(domain: "LLM", code: 13, userInfo: [NSLocalizedDescriptionKey: loc("ai.qwen.error.decode_prompt_chunk_failed")])
             }
 
             pos += Int32(chunkCount)
             offset += chunkCount
 
             let frac = Double(offset) / Double(total)
-            try await emit(progress, deliverOnMainActor, .init(kind: .evaluatingPrompt, fraction: frac, message: "Промпт: \(offset)/\(promptTokens.count) токенов"))
+            try await emit(
+                progress,
+                deliverOnMainActor,
+                .init(kind: .evaluatingPrompt, fraction: frac, message: locf("ai.qwen.progress.prompt_tokens_progress", offset, promptTokens.count))
+            )
         }
 
         return pos
@@ -310,6 +326,14 @@ actor QwenLlamaService {
         let len = llama_token_to_piece(vocab, token, &buf, Int32(buf.count), 0, false)
         guard len > 0 else { return "" }
         return String(cString: buf)
+    }
+
+    private func loc(_ key: String) -> String {
+        NSLocalizedString(key, comment: "")
+    }
+
+    private func locf(_ key: String, _ args: CVarArg...) -> String {
+        String(format: loc(key), arguments: args)
     }
 }
 

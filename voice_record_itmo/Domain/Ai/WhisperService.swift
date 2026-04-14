@@ -33,9 +33,13 @@ actor WhisperService {
 
         var errorDescription: String? {
             switch self {
-            case .modelNotLoaded: return "Whisper модель не загружена."
-            case .emptyResult: return "Whisper вернул пустой результат."
-            case .preprocessFailed(let s): return "Подготовка аудио не удалась: \(s)"
+            case .modelNotLoaded:
+                return NSLocalizedString("ai.whisper.error.model_not_loaded", comment: "")
+            case .emptyResult:
+                return NSLocalizedString("ai.whisper.error.empty_result", comment: "")
+            case .preprocessFailed(let s):
+                let format = NSLocalizedString("ai.whisper.error.preprocess_failed", comment: "")
+                return String(format: format, s)
             }
         }
     }
@@ -61,10 +65,14 @@ actor WhisperService {
         isLoading = true
         defer { isLoading = false }
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 0.05, message: "Инициализация WhisperKit"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 0.05, message: loc("ai.whisper.progress.initializing")))
 
         guard let modelFolderPath = Bundle.main.resourcePath else {
-            throw NSError(domain: "WhisperService", code: -10, userInfo: [NSLocalizedDescriptionKey: "Bundle.main.resourcePath is nil"])
+            throw NSError(
+                domain: "WhisperService",
+                code: -10,
+                userInfo: [NSLocalizedDescriptionKey: loc("ai.whisper.error.resource_path_nil")]
+            )
         }
 
         let config = WhisperKitConfig(
@@ -89,9 +97,9 @@ actor WhisperService {
             useBackgroundDownloadSession: false
         )
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 0.35, message: "Загрузка модели"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 0.35, message: loc("ai.whisper.progress.loading_model")))
         pipe = try await WhisperKit(config)
-        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 1.0, message: "Whisper готов"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .modelLoading, fraction: 1.0, message: loc("ai.whisper.progress.ready")))
     }
 
     func unloadModel() {
@@ -112,7 +120,7 @@ actor WhisperService {
 
         // ПРОСТОЙ препроцессинг:
         // - только приводим к 16kHz mono WAV (без нормализации/фильтров)
-        try await emit(progress, deliverOnMainActor, .init(kind: .preprocessing, fraction: 0.0, message: "Подготовка аудио"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .preprocessing, fraction: 0.0, message: loc("ai.whisper.progress.preparing_audio")))
         let preparedURL = try await convertToWhisperFriendlyWav(
             inputURL: fileURL,
             deliverOnMainActor: deliverOnMainActor,
@@ -125,7 +133,7 @@ actor WhisperService {
             }
         }
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .transcribing, fraction: 0.0, message: "Распознавание"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .transcribing, fraction: 0.0, message: loc("ai.whisper.progress.transcribing")))
 
         var opts = DecodingOptions()
         opts.language = language ?? defaultLanguage
@@ -149,7 +157,7 @@ actor WhisperService {
 
         let results = try await pipe.transcribe(audioPath: preparedURL.path, decodeOptions: opts)
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .transcribing, fraction: 0.9, message: "Сбор результата"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .transcribing, fraction: 0.9, message: loc("ai.whisper.progress.collecting_result")))
 
         let text = results
             .map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -159,7 +167,7 @@ actor WhisperService {
         let cleaned = postprocess(text: text)
         if cleaned.isEmpty { throw ServiceError.emptyResult }
 
-        try await emit(progress, deliverOnMainActor, .init(kind: .done, fraction: 1.0, message: "Готово"))
+        try await emit(progress, deliverOnMainActor, .init(kind: .done, fraction: 1.0, message: loc("ai.whisper.progress.done")))
         return cleaned
     }
 
@@ -201,6 +209,10 @@ actor WhisperService {
             s = s.replacingOccurrences(of: " \(p)", with: p)
         }
         return s.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func loc(_ key: String) -> String {
+        NSLocalizedString(key, comment: "")
     }
 }
 

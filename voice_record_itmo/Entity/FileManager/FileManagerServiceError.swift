@@ -18,13 +18,21 @@ enum FileManagerServiceError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .cannotAccessDocuments: return "Не удалось получить доступ к папке Documents."
-        case .cannotCreateDirectory: return "Не удалось создать папку для записей."
-        case .fileNotFound: return "Файл не найден."
-        case .fileAlreadyExists: return "Файл с таким именем уже существует."
-        case .renameConflict: return "Невозможно переименовать: имя уже занято."
-        case .invalidName: return "Некорректное имя файла."
-        case .io(let err): return "Ошибка файловой системы: \(err.localizedDescription)"
+        case .cannotAccessDocuments:
+            return NSLocalizedString("error.file_manager.cannot_access_documents", comment: "")
+        case .cannotCreateDirectory:
+            return NSLocalizedString("error.file_manager.cannot_create_directory", comment: "")
+        case .fileNotFound:
+            return NSLocalizedString("error.file_manager.file_not_found", comment: "")
+        case .fileAlreadyExists:
+            return NSLocalizedString("error.file_manager.file_already_exists", comment: "")
+        case .renameConflict:
+            return NSLocalizedString("error.file_manager.rename_conflict", comment: "")
+        case .invalidName:
+            return NSLocalizedString("error.file_manager.invalid_name", comment: "")
+        case .io(let err):
+            let format = NSLocalizedString("error.file_manager.io", comment: "")
+            return String(format: format, err.localizedDescription)
         }
     }
 }

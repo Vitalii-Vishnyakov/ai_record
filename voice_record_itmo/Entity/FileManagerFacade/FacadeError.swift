@@ -16,13 +16,14 @@ enum FacadeError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .metadataMissing:
-            return "Метаданные отсутствуют."
+            return NSLocalizedString("error.facade.metadata_missing", comment: "")
         case .metadataIdRequired:
-            return "Нужен metadata.id для операции."
+            return NSLocalizedString("error.facade.metadata_id_required", comment: "")
         case .metadataDoesNotMatchAudio:
-            return "Метаданные не соответствуют аудиофайлу."
+            return NSLocalizedString("error.facade.metadata_does_not_match_audio", comment: "")
         case .io(let e):
-            return "Ошибка: \(e.localizedDescription)"
+            let format = NSLocalizedString("error.facade.io", comment: "")
+            return String(format: format, e.localizedDescription)
         }
     }
 }

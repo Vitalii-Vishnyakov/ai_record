@@ -22,12 +22,16 @@ recording.note = "Note";
 recording.yesterday = "Yesterday";
 recording.recognized = "Transcribed";
 recording.summarized = "Summarized";
+recording.default_title = "Recording";
 
 /* Player */
 player.play = "Play";
 player.pause = "Pause";
 player.stop = "Stop";
 player.speed = "Speed";
+accessibility.record = "Record";
+accessibility.stop = "Stop";
+search.placeholder = "Search...";
 
 /* Recording screen */
 recording.in_progress = "Recording in progress…";
@@ -59,6 +63,11 @@ alert.delete.message = "This recording will be permanently deleted.";
 alert.delete.confirm = "Delete";
 alert.delete.cancel = "Cancel";
 
+/* Alerts – summary share */
+alert.summary_missing.title = "Summary is not ready yet";
+alert.summary_missing.message = "Wait until summary generation is complete, then you can share it.";
+alert.summary_missing.ok = "OK";
+
 /* Alerts – rename */
 alert.rename.title = "Rename recording";
 alert.rename.placeholder = "New name";
@@ -74,3 +83,82 @@ alert.exit_recording.cancel = "Continue";
 /* Errors */
 error.generic = "Something went wrong";
 error.audio_permission = "Microphone access denied";
+
+/* Errors - FileManager */
+error.file_manager.cannot_access_documents = "Failed to access Documents folder.";
+error.file_manager.cannot_create_directory = "Failed to create recordings folder.";
+error.file_manager.file_not_found = "File not found.";
+error.file_manager.file_already_exists = "A file with this name already exists.";
+error.file_manager.rename_conflict = "Cannot rename: name is already taken.";
+error.file_manager.invalid_name = "Invalid file name.";
+error.file_manager.io = "File system error: %@";
+
+/* Errors - Metadata */
+error.metadata.cannot_access_documents = "Failed to access Documents.";
+error.metadata.cannot_create_directory = "Failed to create metadata folder.";
+error.metadata.invalid_file_name = "Invalid file name.";
+error.metadata.not_found = "Metadata not found.";
+error.metadata.io = "File system error: %@";
+error.metadata.decode = "Failed to read JSON: %@";
+error.metadata.encode = "Failed to write JSON: %@";
+
+/* Errors - Facade */
+error.facade.metadata_missing = "Metadata is missing.";
+error.facade.metadata_id_required = "metadata.id is required for this operation.";
+error.facade.metadata_does_not_match_audio = "Metadata does not match audio file.";
+error.facade.io = "Error: %@";
+
+/* Errors - Recording */
+error.recording.microphone_permission_denied = "Microphone access denied.";
+error.recording.audio_session = "Audio session error: %@";
+error.recording.recorder_init = "Recorder initialization error: %@";
+error.recording.recorder_start_failed = "Failed to start recording.";
+error.recording.player_init = "Player initialization error: %@";
+error.recording.no_recorder = "Recorder is not initialized.";
+error.recording.no_player = "Player is not initialized.";
+error.recording.invalid_url = "Invalid URL.";
+error.recording.invalid_time = "Invalid time.";
+
+/* AI - Facade */
+ai.facade.error.empty_transcription = "Empty transcription.";
+ai.facade.error.empty_summary = "Empty summary.";
+ai.facade.progress.loading_whisper = "Loading Whisper";
+ai.facade.progress.loading_qwen = "Loading Qwen";
+ai.facade.progress.models_ready = "Models are ready";
+ai.facade.progress.transcription_ready = "Transcription is ready";
+ai.facade.progress.summarizing = "Summarizing";
+ai.facade.progress.summary_ready = "Summary is ready";
+
+/* AI - Whisper */
+ai.whisper.error.model_not_loaded = "Whisper model is not loaded.";
+ai.whisper.error.empty_result = "Whisper returned an empty result.";
+ai.whisper.error.preprocess_failed = "Audio preprocessing failed: %@";
+ai.whisper.error.resource_path_nil = "Bundle.main.resourcePath is nil.";
+ai.whisper.progress.initializing = "Initializing WhisperKit";
+ai.whisper.progress.loading_model = "Loading model";
+ai.whisper.progress.ready = "Whisper is ready";
+ai.whisper.progress.preparing_audio = "Preparing audio";
+ai.whisper.progress.transcribing = "Transcribing";
+ai.whisper.progress.collecting_result = "Collecting result";
+ai.whisper.progress.done = "Done";
+
+/* AI - Qwen */
+ai.qwen.error.model_not_found_in_bundle = "Model not found in bundle.";
+ai.qwen.error.failed_to_load_model_at = "Failed to load model at path: %@";
+ai.qwen.error.model_not_loaded = "Model is not loaded.";
+ai.qwen.error.failed_to_create_context = "Failed to create context.";
+ai.qwen.error.failed_to_get_logits = "Failed to get logits.";
+ai.qwen.error.decode_next_failed = "Failed to decode next token.";
+ai.qwen.error.tokenization_failed = "Tokenization failed.";
+ai.qwen.error.decode_prompt_chunk_failed = "Failed to decode prompt chunk.";
+ai.qwen.progress.initializing_backend = "Initializing backend";
+ai.qwen.progress.reading_model = "Reading model";
+ai.qwen.progress.model_loaded = "Model loaded";
+ai.qwen.progress.preparing_prompt = "Preparing prompt";
+ai.qwen.progress.tokens_count = "Tokens: %d";
+ai.qwen.progress.generating_response = "Generating response";
+ai.qwen.progress.tokens_progress = "Tokens: %d/%d";
+ai.qwen.progress.prompt_tokens_progress = "Prompt: %d/%d tokens";
+ai.qwen.progress.done = "Done";
+ai.qwen.prompt.system = "You are an assistant. Produce a short and precise summary.";
+ai.qwen.prompt.user_template = "Summarize the text in a few concise bullet points, without fluff:\n\n%@";

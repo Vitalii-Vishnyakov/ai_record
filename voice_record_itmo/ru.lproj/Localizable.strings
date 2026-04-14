@@ -22,12 +22,16 @@ recording.note = "Заметка";
 recording.yesterday = "Вчера";
 recording.recognized = "Распознано";
 recording.summarized = "Суммаризировано";
+recording.default_title = "Запись";
 
 /* Player */
 player.play = "Воспроизвести";
 player.pause = "Пауза";
 player.stop = "Стоп";
 player.speed = "Скорость";
+accessibility.record = "Записать";
+accessibility.stop = "Остановить";
+search.placeholder = "Поиск...";
 
 /* Recording screen */
 recording.in_progress = "Идёт запись…";
@@ -59,6 +63,11 @@ alert.delete.message = "Запись будет удалена без возмо
 alert.delete.confirm = "Удалить";
 alert.delete.cancel = "Отмена";
 
+/* Alerts – summary share */
+alert.summary_missing.title = "Суммаризации пока нет";
+alert.summary_missing.message = "Сначала дождитесь создания суммаризации, затем её можно отправить.";
+alert.summary_missing.ok = "Понятно";
+
 /* Alerts – rename */
 alert.rename.title = "Переименовать запись";
 alert.rename.placeholder = "Новое название";
@@ -74,3 +83,82 @@ alert.exit_recording.cancel = "Продолжить";
 /* Errors */
 error.generic = "Произошла ошибка";
 error.audio_permission = "Нет доступа к микрофону";
+
+/* Errors - FileManager */
+error.file_manager.cannot_access_documents = "Не удалось получить доступ к папке Documents.";
+error.file_manager.cannot_create_directory = "Не удалось создать папку для записей.";
+error.file_manager.file_not_found = "Файл не найден.";
+error.file_manager.file_already_exists = "Файл с таким именем уже существует.";
+error.file_manager.rename_conflict = "Невозможно переименовать: имя уже занято.";
+error.file_manager.invalid_name = "Некорректное имя файла.";
+error.file_manager.io = "Ошибка файловой системы: %@";
+
+/* Errors - Metadata */
+error.metadata.cannot_access_documents = "Не удалось получить доступ к Documents.";
+error.metadata.cannot_create_directory = "Не удалось создать папку метаданных.";
+error.metadata.invalid_file_name = "Некорректное имя файла.";
+error.metadata.not_found = "Метаданные не найдены.";
+error.metadata.io = "Ошибка файловой системы: %@";
+error.metadata.decode = "Не удалось прочитать JSON: %@";
+error.metadata.encode = "Не удалось записать JSON: %@";
+
+/* Errors - Facade */
+error.facade.metadata_missing = "Метаданные отсутствуют.";
+error.facade.metadata_id_required = "Нужен metadata.id для операции.";
+error.facade.metadata_does_not_match_audio = "Метаданные не соответствуют аудиофайлу.";
+error.facade.io = "Ошибка: %@";
+
+/* Errors - Recording */
+error.recording.microphone_permission_denied = "Нет доступа к микрофону.";
+error.recording.audio_session = "Ошибка аудиосессии: %@";
+error.recording.recorder_init = "Ошибка инициализации рекордера: %@";
+error.recording.recorder_start_failed = "Не удалось начать запись.";
+error.recording.player_init = "Ошибка инициализации плеера: %@";
+error.recording.no_recorder = "Рекордер не создан.";
+error.recording.no_player = "Плеер не создан.";
+error.recording.invalid_url = "Некорректный URL.";
+error.recording.invalid_time = "Некорректное время.";
+
+/* AI - Facade */
+ai.facade.error.empty_transcription = "Пустая транскрипция.";
+ai.facade.error.empty_summary = "Пустая суммаризация.";
+ai.facade.progress.loading_whisper = "Загрузка Whisper";
+ai.facade.progress.loading_qwen = "Загрузка Qwen";
+ai.facade.progress.models_ready = "Модели готовы";
+ai.facade.progress.transcription_ready = "Транскрипция готова";
+ai.facade.progress.summarizing = "Суммаризация";
+ai.facade.progress.summary_ready = "Суммаризация готова";
+
+/* AI - Whisper */
+ai.whisper.error.model_not_loaded = "Whisper модель не загружена.";
+ai.whisper.error.empty_result = "Whisper вернул пустой результат.";
+ai.whisper.error.preprocess_failed = "Подготовка аудио не удалась: %@";
+ai.whisper.error.resource_path_nil = "Bundle.main.resourcePath отсутствует.";
+ai.whisper.progress.initializing = "Инициализация WhisperKit";
+ai.whisper.progress.loading_model = "Загрузка модели";
+ai.whisper.progress.ready = "Whisper готов";
+ai.whisper.progress.preparing_audio = "Подготовка аудио";
+ai.whisper.progress.transcribing = "Распознавание";
+ai.whisper.progress.collecting_result = "Сбор результата";
+ai.whisper.progress.done = "Готово";
+
+/* AI - Qwen */
+ai.qwen.error.model_not_found_in_bundle = "Модель не найдена в bundle.";
+ai.qwen.error.failed_to_load_model_at = "Не удалось загрузить модель по пути: %@";
+ai.qwen.error.model_not_loaded = "Модель не загружена.";
+ai.qwen.error.failed_to_create_context = "Не удалось создать контекст.";
+ai.qwen.error.failed_to_get_logits = "Не удалось получить logits.";
+ai.qwen.error.decode_next_failed = "Не удалось декодировать следующий токен.";
+ai.qwen.error.tokenization_failed = "Ошибка токенизации.";
+ai.qwen.error.decode_prompt_chunk_failed = "Не удалось декодировать chunk промпта.";
+ai.qwen.progress.initializing_backend = "Инициализация backend";
+ai.qwen.progress.reading_model = "Чтение модели";
+ai.qwen.progress.model_loaded = "Модель загружена";
+ai.qwen.progress.preparing_prompt = "Подготовка промпта";
+ai.qwen.progress.tokens_count = "Токены: %d";
+ai.qwen.progress.generating_response = "Генерация ответа";
+ai.qwen.progress.tokens_progress = "Токены: %d/%d";
+ai.qwen.progress.prompt_tokens_progress = "Промпт: %d/%d токенов";
+ai.qwen.progress.done = "Готово";
+ai.qwen.prompt.system = "Ты помощник. Делай короткое точное резюме.";
+ai.qwen.prompt.user_template = "Суммаризируй текст в нескольких пунктах, без воды:\n\n%@";

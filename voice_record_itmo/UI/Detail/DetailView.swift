@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 // MARK: - Detail Screen
 
@@ -43,6 +44,14 @@ struct DetailView: View {
             }
         } message: {
             Text(L10n.alertDeleteMessage.text)
+        }
+        .alert(L10n.alertSummaryMissingTitle.text, isPresented: $viewModel.isSummaryMissingAlertPresented) {
+            Button(L10n.alertSummaryMissingOk.text, role: .cancel) { }
+        } message: {
+            Text(L10n.alertSummaryMissingMessage.text)
+        }
+        .sheet(isPresented: $viewModel.isShareSheetPresented) {
+            ActivityViewController(activityItems: [viewModel.shareText])
         }
     }
     
@@ -277,6 +286,16 @@ struct DetailView: View {
                 .stroke(Color(.systemIndigo).opacity(0.18), lineWidth: 1)
         )
     }
+}
+
+private struct ActivityViewController: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) { }
 }
 
 // MARK: - Components

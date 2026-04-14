@@ -89,7 +89,7 @@ struct NewRecordingView: View {
     
     private var timeBlock: some View {
         VStack(spacing: 8) {
-            Text("\(viewModel.elapsedSeconds)")
+            Text(viewModel.formattedElapsedTime)
                 .font(.system(size: 52, weight: .bold))
                 .foregroundStyle(Color(.label))
             
@@ -157,7 +157,7 @@ struct NewRecordingView: View {
                 }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Stop")
+            .accessibilityLabel(L10n.accessibilityStop.text)
             
             CircleIconButtonLarge(
                 systemImage: viewModel.isBookmarked ? "bookmark.fill" : "bookmark",

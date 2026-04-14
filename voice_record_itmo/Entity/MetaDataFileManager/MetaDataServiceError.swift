@@ -18,13 +18,23 @@ enum MetaDataServiceError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .cannotAccessDocuments: return "Не удалось получить доступ к Documents."
-        case .cannotCreateDirectory: return "Не удалось создать папку метаданных."
-        case .invalidFileName: return "Некорректное имя файла."
-        case .notFound: return "Метаданные не найдены."
-        case .io(let e): return "Ошибка файловой системы: \(e.localizedDescription)"
-        case .decode(let e): return "Не удалось прочитать JSON: \(e.localizedDescription)"
-        case .encode(let e): return "Не удалось записать JSON: \(e.localizedDescription)"
+        case .cannotAccessDocuments:
+            return NSLocalizedString("error.metadata.cannot_access_documents", comment: "")
+        case .cannotCreateDirectory:
+            return NSLocalizedString("error.metadata.cannot_create_directory", comment: "")
+        case .invalidFileName:
+            return NSLocalizedString("error.metadata.invalid_file_name", comment: "")
+        case .notFound:
+            return NSLocalizedString("error.metadata.not_found", comment: "")
+        case .io(let e):
+            let format = NSLocalizedString("error.metadata.io", comment: "")
+            return String(format: format, e.localizedDescription)
+        case .decode(let e):
+            let format = NSLocalizedString("error.metadata.decode", comment: "")
+            return String(format: format, e.localizedDescription)
+        case .encode(let e):
+            let format = NSLocalizedString("error.metadata.encode", comment: "")
+            return String(format: format, e.localizedDescription)
         }
     }
 }

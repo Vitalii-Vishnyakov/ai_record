@@ -21,6 +21,9 @@ final class DetailViewModel: ObservableObject {
     @Published var currentStatusProgress: Double = .zero
     @Published var isAiActionEnabled: Bool = false
     @Published var isDeleteAlertPresented: Bool = false
+    @Published var isSummaryMissingAlertPresented: Bool = false
+    @Published var isShareSheetPresented: Bool = false
+    @Published var shareText: String = ""
     
     private weak var router: Router?
     
@@ -65,7 +68,7 @@ final class DetailViewModel: ObservableObject {
                     self?.transcript = result.transcript
                     self?.summary = AISummary(
                         text: result.summary,
-                        keyWords: ["какие", "то", "слова"] // если позже добавишь keywords из LLM
+                        keyWords: [] // если позже добавишь keywords из LLM
                     )
                     self?.saveSummaryIfPossible()
                 } catch {
@@ -162,27 +165,15 @@ final class DetailViewModel: ObservableObject {
     }
     
     // MARK: - Share
-    
-    /// Возвращает объект для UIActivityViewController.
-    /// Удобно: View сможет вызвать этот метод и открыть share sheet.
-    func makeShareItems() -> [Any] {
-        guard let audioURL = bundle?.audio.audioURL else { return [] }
-        
-        var items: [Any] = [audioURL]
-        
-        if !transcript.isEmpty {
-            items.append(transcript)
-        }
-        if !summary.text.isEmpty {
-            items.append(summary.text)
-        }
-        return items
-    }
-    
+
     func onShareTap() {
-        // Здесь навигация зависит от твоей архитектуры.
-        // Обычно: router?.presentShare(items: makeShareItems())
-        // Поэтому оставляю безопасно пустым, чтобы не сломать проект.
+        let text = summary.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else {
+            isSummaryMissingAlertPresented = true
+            return
+        }
+        shareText = text
+        isShareSheetPresented = true
     }
     
     private func bindAI() {

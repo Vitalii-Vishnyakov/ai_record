@@ -61,7 +61,7 @@ struct MainView: View {
     private var header: some View {
         HStack(alignment: .top, spacing: 8) {
             if viewModel.isSearchPresented {
-                TextField("Search...", text: $viewModel.searchText)
+                TextField(L10n.searchPlaceholder.text, text: $viewModel.searchText)
                     .textInputAutocapitalization(.sentences)
                     .disableAutocorrection(true)
                     .padding(.horizontal, 14)
@@ -127,6 +127,6 @@ struct MainView: View {
                         .shadow(color: Color.black.opacity(0.18), radius: 12, x: 0, y: 8)
                 )
         }
-        .accessibilityLabel("Record")
+        .accessibilityLabel(L10n.accessibilityRecord.text)
     }
 }

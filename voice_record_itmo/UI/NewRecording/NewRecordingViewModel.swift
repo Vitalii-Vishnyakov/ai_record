@@ -21,6 +21,10 @@ final class NewRecordingViewModel: ObservableObject {
     @Published var currentStatusProgress: Double = .zero
 
     @Published var isPulsingAnimation: Bool = false
+
+    var formattedElapsedTime: String {
+        formatDuration(elapsedSeconds)
+    }
     
     private var secondsTimer: Timer?
     private var pulseTimer: Timer?
@@ -282,7 +286,7 @@ final class NewRecordingViewModel: ObservableObject {
     private func effectiveTitle() -> String {
         let t = recordingName.trimmingCharacters(in: .whitespacesAndNewlines)
         if !t.isEmpty { return t }
-        return currentAudioURL?.deletingPathExtension().lastPathComponent ?? "Recording"
+        return currentAudioURL?.deletingPathExtension().lastPathComponent ?? L10n.recordingDefaultTitle.text
     }
 
     private func makeInitialMetadata(audioURL: URL) -> RecordingMetadata {
@@ -407,5 +411,17 @@ final class NewRecordingViewModel: ObservableObject {
             modelName: m.modelName,
             modelVersion: m.modelVersion
         )
+    }
+
+    private func formatDuration(_ totalSeconds: Int) -> String {
+        let clamped = max(0, totalSeconds)
+        let hours = clamped / 3600
+        let minutes = (clamped % 3600) / 60
+        let seconds = clamped % 60
+
+        if hours > 0 {
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        }
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

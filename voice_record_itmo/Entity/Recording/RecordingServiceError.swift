@@ -20,15 +20,27 @@ enum RecordingServiceError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .microphonePermissionDenied: return "Mic denied"
-        case .audioSession(let e): return "AudioSession error: \(e.localizedDescription)"
-        case .recorderInit(let e): return "Recorder init error: \(e.localizedDescription)"
-        case .recorderStartFailed: return "Не удалось начать запись"
-        case .playerInit(let e): return "Player init error: \(e.localizedDescription)"
-        case .noRecorder: return "Recorder не создан"
-        case .noPlayer: return "Player не создан"
-        case .invalidURL: return "Некорректный URL"
-        case .invalidTime: return "Некорректное время"
+        case .microphonePermissionDenied:
+            return NSLocalizedString("error.recording.microphone_permission_denied", comment: "")
+        case .audioSession(let e):
+            let format = NSLocalizedString("error.recording.audio_session", comment: "")
+            return String(format: format, e.localizedDescription)
+        case .recorderInit(let e):
+            let format = NSLocalizedString("error.recording.recorder_init", comment: "")
+            return String(format: format, e.localizedDescription)
+        case .recorderStartFailed:
+            return NSLocalizedString("error.recording.recorder_start_failed", comment: "")
+        case .playerInit(let e):
+            let format = NSLocalizedString("error.recording.player_init", comment: "")
+            return String(format: format, e.localizedDescription)
+        case .noRecorder:
+            return NSLocalizedString("error.recording.no_recorder", comment: "")
+        case .noPlayer:
+            return NSLocalizedString("error.recording.no_player", comment: "")
+        case .invalidURL:
+            return NSLocalizedString("error.recording.invalid_url", comment: "")
+        case .invalidTime:
+            return NSLocalizedString("error.recording.invalid_time", comment: "")
         }
     }
 }

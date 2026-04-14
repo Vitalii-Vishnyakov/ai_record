@@ -25,12 +25,16 @@ enum L10n {
     case recordingYesterday
     case recordingRecognized
     case recordingSummarized
+    case recordingDefaultTitle
 
     // MARK: - Player
     case playerPlay
     case playerPause
     case playerStop
     case playerSpeed
+    case accessibilityRecord
+    case accessibilityStop
+    case searchPlaceholder
 
     // MARK: - Recording screen
     case recordingInProgress
@@ -61,6 +65,11 @@ enum L10n {
     case alertDeleteMessage
     case alertDeleteConfirm
     case alertDeleteCancel
+    
+    // MARK: - Alerts: Summary share
+    case alertSummaryMissingTitle
+    case alertSummaryMissingMessage
+    case alertSummaryMissingOk
 
     // MARK: - Alerts: Rename
     case alertRenameTitle
@@ -96,11 +105,15 @@ enum L10n {
         case .recordingYesterday: return "recording.yesterday"
         case .recordingRecognized: return "recording.recognized"
         case .recordingSummarized: return "recording.summarized"
+        case .recordingDefaultTitle: return "recording.default_title"
 
         case .playerPlay: return "player.play"
         case .playerPause: return "player.pause"
         case .playerStop: return "player.stop"
         case .playerSpeed: return "player.speed"
+        case .accessibilityRecord: return "accessibility.record"
+        case .accessibilityStop: return "accessibility.stop"
+        case .searchPlaceholder: return "search.placeholder"
 
         case .recordingInProgress: return "recording.in_progress"
         case .recordPaused: return "recording.paused"
@@ -127,6 +140,10 @@ enum L10n {
         case .alertDeleteMessage: return "alert.delete.message"
         case .alertDeleteConfirm: return "alert.delete.confirm"
         case .alertDeleteCancel: return "alert.delete.cancel"
+            
+        case .alertSummaryMissingTitle: return "alert.summary_missing.title"
+        case .alertSummaryMissingMessage: return "alert.summary_missing.message"
+        case .alertSummaryMissingOk: return "alert.summary_missing.ok"
 
         case .alertRenameTitle: return "alert.rename.title"
         case .alertRenamePlaceholder: return "alert.rename.placeholder"

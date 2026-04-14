@@ -33,8 +33,8 @@ final class AiFacade {
 
         var errorDescription: String? {
             switch self {
-            case .emptyTranscription: return "Пустая транскрипция."
-            case .emptySummary: return "Пустая суммаризация."
+            case .emptyTranscription: return NSLocalizedString("ai.facade.error.empty_transcription", comment: "")
+            case .emptySummary: return NSLocalizedString("ai.facade.error.empty_summary", comment: "")
             }
         }
     }
@@ -60,7 +60,7 @@ final class AiFacade {
     }
 
     func loadModels() async throws {
-        emit(.init(stage: .loadingModels, fraction: 0.0, message: "Загрузка Whisper"))
+        emit(.init(stage: .loadingModels, fraction: 0.0, message: NSLocalizedString("ai.facade.progress.loading_whisper", comment: "")))
 
         try await whisper.loadModel(deliverOnMainActor: true) { [weak self] ev in
             Task { @MainActor in
@@ -70,7 +70,7 @@ final class AiFacade {
             }
         }
 
-        emit(.init(stage: .loadingModels, fraction: 0.5, message: "Загрузка Qwen"))
+        emit(.init(stage: .loadingModels, fraction: 0.5, message: NSLocalizedString("ai.facade.progress.loading_qwen", comment: "")))
 
         try await qwen.loadModel(deliverOnMainActor: true) { [weak self] ev in
             Task { @MainActor in
@@ -80,7 +80,7 @@ final class AiFacade {
             }
         }
 
-        emit(.init(stage: .done, fraction: 1.0, message: "Модели готовы"))
+        emit(.init(stage: .done, fraction: 1.0, message: NSLocalizedString("ai.facade.progress.models_ready", comment: "")))
     }
 
     func transcribe(audioURL: URL, language: String = "ru") async throws -> String {
@@ -99,7 +99,7 @@ final class AiFacade {
                 case .transcribing:
                     self.emit(.init(stage: .transcribing, fraction: ev.fraction, message: ev.message))
                 case .done:
-                    self.emit(.init(stage: .transcribing, fraction: 1.0, message: "Транскрипция готова"))
+                    self.emit(.init(stage: .transcribing, fraction: 1.0, message: NSLocalizedString("ai.facade.progress.transcription_ready", comment: "")))
                 }
             }
         }
@@ -113,7 +113,7 @@ final class AiFacade {
     }
 
     func summarize(text: String) async throws -> String {
-        emit(.init(stage: .summarizing, fraction: 0.0, message: "Суммаризация"))
+        emit(.init(stage: .summarizing, fraction: 0.0, message: NSLocalizedString("ai.facade.progress.summarizing", comment: "")))
 
         let out = try await qwen.summarize(
             text: text,
@@ -130,7 +130,7 @@ final class AiFacade {
             throw AiError.emptySummary
         }
 
-        emit(.init(stage: .done, fraction: 1.0, message: "Суммаризация готова"))
+        emit(.init(stage: .done, fraction: 1.0, message: NSLocalizedString("ai.facade.progress.summary_ready", comment: "")))
         return out
     }
 
