@@ -36,3 +36,7 @@ enum AppDependencies {
     )
     static let recordingService = RecordingService()
 }
+
+extension Notification.Name {
+    static let recordingsDidChange = Notification.Name("recordingsDidChange")
+}

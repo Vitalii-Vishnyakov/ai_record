@@ -25,6 +25,7 @@ final class MainViewModel: ObservableObject {
     private let facade: FileManagerFacadeProtocol
     private let player: RecordingService
     private let calendar: Calendar
+    private let notificationCenter: NotificationCenter
 
     private var bundles: [RecordingBundle] = []
     private var currentlyPlayingId: String?
@@ -37,12 +38,16 @@ final class MainViewModel: ObservableObject {
         router: Router?,
         facade: FileManagerFacadeProtocol,
         player: RecordingService,
-        calendar: Calendar = .current
+        calendar: Calendar = .current,
+        notificationCenter: NotificationCenter = .default
     ) {
         self.router = router
         self.facade = facade
         self.player = player
         self.calendar = calendar
+        self.notificationCenter = notificationCenter
+
+        bindRecordingChanges()
 
         syncAIStatusWithCurrentEvent()
         
@@ -184,6 +189,15 @@ final class MainViewModel: ObservableObject {
             .sink { [weak self] ev in
                 self?.neuralStatus = mapStageToNeuralStatus(ev.stage)
                 self?.currentStatusProgress = ev.fraction
+            }
+            .store(in: &bag)
+    }
+
+    private func bindRecordingChanges() {
+        notificationCenter.publisher(for: .recordingsDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.reload()
             }
             .store(in: &bag)
     }

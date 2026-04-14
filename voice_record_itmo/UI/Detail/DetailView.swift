@@ -36,6 +36,14 @@ struct DetailView: View {
         .onDisappear {
             viewModel.onDisappear()
         }
+        .alert(L10n.alertDeleteTitle.text, isPresented: $viewModel.isDeleteAlertPresented) {
+            Button(L10n.alertDeleteCancel.text, role: .cancel) { }
+            Button(L10n.alertDeleteConfirm.text, role: .destructive) {
+                viewModel.onDeleteConfirmTap()
+            }
+        } message: {
+            Text(L10n.alertDeleteMessage.text)
+        }
     }
     
     private var header: some View {
@@ -48,7 +56,7 @@ struct DetailView: View {
                 Spacer()
                 
                 CircleIconButton(systemImage: "trash") {
-                    
+                    viewModel.onDeleteTap()
                 }
                 
                 CircleIconButton(systemImage: "doc.append") {

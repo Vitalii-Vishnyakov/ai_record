@@ -20,6 +20,7 @@ final class DetailViewModel: ObservableObject {
     @Published var summary: AISummary = AISummary()
     @Published var currentStatusProgress: Double = .zero
     @Published var isAiActionEnabled: Bool = false
+    @Published var isDeleteAlertPresented: Bool = false
     
     private weak var router: Router?
     
@@ -33,6 +34,7 @@ final class DetailViewModel: ObservableObject {
     private let calendar: Calendar
     private var timer: Timer?
     private var isAIBound = false
+    private var isDeleted = false
     
     private var bag = Set<AnyCancellable>()
     
@@ -79,7 +81,9 @@ final class DetailViewModel: ObservableObject {
     }
     
     func onDisappear() {
-        saveProgressIfPossible()
+        if !isDeleted {
+            saveProgressIfPossible()
+        }
         stopTimer()
         bag.removeAll()
         isAIBound = false
@@ -90,6 +94,14 @@ final class DetailViewModel: ObservableObject {
         stopTimer()
         try? player.stopPlayback()
         router?.pop()
+    }
+
+    func onDeleteTap() {
+        isDeleteAlertPresented = true
+    }
+
+    func onDeleteConfirmTap() {
+        deleteCurrentRecording()
     }
     
     // MARK: - Load
@@ -484,6 +496,21 @@ final class DetailViewModel: ObservableObject {
         do {
             try facade.updateMetadata(m)
             metadata = m
+        } catch { }
+    }
+
+    private func deleteCurrentRecording() {
+        guard let bundle else { return }
+
+        do {
+            stopTimer()
+            if player.currentPlaybackURL == bundle.audio.audioURL {
+                try? player.stopPlayback()
+            }
+            try facade.deleteRecording(bundle: bundle)
+            isDeleted = true
+            NotificationCenter.default.post(name: .recordingsDidChange, object: nil)
+            router?.pop()
         } catch { }
     }
     
