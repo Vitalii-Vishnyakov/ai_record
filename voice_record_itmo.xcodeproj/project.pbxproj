@@ -17,12 +17,23 @@
 		95FDBB0C2ED62A0500CCA154 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 95FDBB0B2ED62A0500CCA154 /* WhisperKit */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		9502F3B62F8E5E650082B651 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9561BA422ED4C57B00883768 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9561BA492ED4C57B00883768;
+			remoteInfo = voice_record_itmo;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		9502F1672F8E3CEE0082B651 /* AudioEncoder.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AudioEncoder.mlmodelc; sourceTree = "<group>"; };
 		9502F1682F8E3CEE0082B651 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
 		9502F1692F8E3CEE0082B651 /* generation_config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = generation_config.json; sourceTree = "<group>"; };
 		9502F16A2F8E3CEE0082B651 /* MelSpectrogram.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = MelSpectrogram.mlmodelc; sourceTree = "<group>"; };
 		9502F16B2F8E3CEE0082B651 /* TextDecoder.mlmodelc */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = TextDecoder.mlmodelc; sourceTree = "<group>"; };
+		9502F3B22F8E5E650082B651 /* voice_record_itmoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = voice_record_itmoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9561BA4A2ED4C57B00883768 /* voice_record_itmo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = voice_record_itmo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		957AC0D92F0D2E6200CCCF2F /* qwen2.5-1.5b-instruct-q4_k_m.gguf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "qwen2.5-1.5b-instruct-q4_k_m.gguf"; sourceTree = "<group>"; };
 		95C766202ED761F400F544A0 /* memory.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = memory.entitlements; sourceTree = "<group>"; };
@@ -39,6 +50,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		9502F3B32F8E5E650082B651 /* voice_record_itmoTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = voice_record_itmoTests;
+			sourceTree = "<group>";
+		};
 		9561BA4C2ED4C57B00883768 /* voice_record_itmo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -50,6 +66,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9502F3AF2F8E5E650082B651 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9561BA472ED4C57B00883768 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -79,6 +102,7 @@
 			children = (
 				9502F16C2F8E3CEE0082B651 /* openai_whisper-small */,
 				9561BA4C2ED4C57B00883768 /* voice_record_itmo */,
+				9502F3B32F8E5E650082B651 /* voice_record_itmoTests */,
 				9561BA4B2ED4C57B00883768 /* Products */,
 				95C766202ED761F400F544A0 /* memory.entitlements */,
 				957AC0D92F0D2E6200CCCF2F /* qwen2.5-1.5b-instruct-q4_k_m.gguf */,
@@ -89,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				9561BA4A2ED4C57B00883768 /* voice_record_itmo.app */,
+				9502F3B22F8E5E650082B651 /* voice_record_itmoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,6 +121,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9502F3B12F8E5E650082B651 /* voice_record_itmoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9502F3B82F8E5E650082B651 /* Build configuration list for PBXNativeTarget "voice_record_itmoTests" */;
+			buildPhases = (
+				9502F3AE2F8E5E650082B651 /* Sources */,
+				9502F3AF2F8E5E650082B651 /* Frameworks */,
+				9502F3B02F8E5E650082B651 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9502F3B72F8E5E650082B651 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9502F3B32F8E5E650082B651 /* voice_record_itmoTests */,
+			);
+			name = voice_record_itmoTests;
+			packageProductDependencies = (
+			);
+			productName = voice_record_itmoTests;
+			productReference = 9502F3B22F8E5E650082B651 /* voice_record_itmoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		9561BA492ED4C57B00883768 /* voice_record_itmo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9561BA5D2ED4C57C00883768 /* Build configuration list for PBXNativeTarget "voice_record_itmo" */;
@@ -127,9 +175,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					9502F3B12F8E5E650082B651 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 9561BA492ED4C57B00883768;
+					};
 					9561BA492ED4C57B00883768 = {
 						CreatedOnToolsVersion = 16.0;
 					};
@@ -155,11 +207,19 @@
 			projectRoot = "";
 			targets = (
 				9561BA492ED4C57B00883768 /* voice_record_itmo */,
+				9502F3B12F8E5E650082B651 /* voice_record_itmoTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		9502F3B02F8E5E650082B651 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9561BA482ED4C57B00883768 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -176,6 +236,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9502F3AE2F8E5E650082B651 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9561BA462ED4C57B00883768 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -185,7 +252,59 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		9502F3B72F8E5E650082B651 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9561BA492ED4C57B00883768 /* voice_record_itmo */;
+			targetProxy = 9502F3B62F8E5E650082B651 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		9502F3B92F8E5E650082B651 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NS2RKY6UNW;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "vitalii.voice-record-itmoTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/voice_record_itmo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/voice_record_itmo";
+			};
+			name = Debug;
+		};
+		9502F3BA2F8E5E650082B651 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NS2RKY6UNW;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "vitalii.voice-record-itmoTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/voice_record_itmo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/voice_record_itmo";
+			};
+			name = Release;
+		};
 		9561BA5E2ED4C57C00883768 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -378,6 +497,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9502F3B82F8E5E650082B651 /* Build configuration list for PBXNativeTarget "voice_record_itmoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9502F3B92F8E5E650082B651 /* Debug */,
+				9502F3BA2F8E5E650082B651 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9561BA452ED4C57B00883768 /* Build configuration list for PBXProject "voice_record_itmo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
