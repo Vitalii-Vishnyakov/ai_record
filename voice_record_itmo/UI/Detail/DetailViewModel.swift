@@ -226,15 +226,50 @@ final class DetailViewModel: ObservableObject {
         }
     }
     
-    func onForwardTap15() { skip(seconds: 15) }
-    func onForwardTap60() { skip(seconds: 60) }
+    func onSeekToStartTap() { seekToStart() }
     func onBackwardTap15() { skip(seconds: -15) }
-    func onBackwardTap60() { skip(seconds: -60) }
+    func onForwardTap15() { skip(seconds: 15) }
+    func onSeekToEndTap() { seekToEnd() }
     
     private func skip(seconds: TimeInterval) {
         do {
+            guard let audioURL = bundle?.audio.audioURL else { return }
+            if player.currentPlaybackURL != audioURL || !isPlayerReady {
+                try preparePlayerIfPossible()
+            }
             try player.skip(by: seconds)
             syncPlaybackFromPlayer()
+            syncPlaybackBindingFromPlayer()
+            saveProgressIfPossible()
+        } catch { }
+    }
+
+    private func seekToStart() {
+        seek(to: 0)
+    }
+
+    private func seekToEnd() {
+        do {
+            guard let audioURL = bundle?.audio.audioURL else { return }
+            if player.currentPlaybackURL != audioURL || !isPlayerReady {
+                try preparePlayerIfPossible()
+            }
+            let total = try player.duration()
+            seek(to: total)
+        } catch { }
+    }
+
+    private func seek(to position: TimeInterval) {
+        do {
+            guard let audioURL = bundle?.audio.audioURL else { return }
+            if player.currentPlaybackURL != audioURL || !isPlayerReady {
+                try preparePlayerIfPossible()
+            }
+            let total = try player.duration()
+            let clamped = max(0, min(total, position))
+            try player.seek(to: clamped)
+            syncPlaybackFromPlayer()
+            syncPlaybackBindingFromPlayer()
             saveProgressIfPossible()
         } catch { }
     }

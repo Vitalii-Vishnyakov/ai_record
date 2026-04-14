@@ -112,8 +112,8 @@ struct DetailView: View {
             }
             
             HStack(spacing: 16) {
-                PlayerChipButton(systemImage: "backward.fill") {
-                    viewModel.onBackwardTap60()
+                PlayerChipButton(systemImage: "backward.end.fill") {
+                    viewModel.onSeekToStartTap()
                 }
                 
                 PlayerChipButton(systemImage: "gobackward") {
@@ -128,8 +128,8 @@ struct DetailView: View {
                     viewModel.onForwardTap15()
                 }
                 
-                PlayerChipButton(systemImage: "forward.fill") {
-                    viewModel.onForwardTap60()
+                PlayerChipButton(systemImage: "forward.end.fill") {
+                    viewModel.onSeekToEndTap()
                 }
             }
         }

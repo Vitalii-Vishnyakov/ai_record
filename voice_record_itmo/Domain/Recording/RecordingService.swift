@@ -200,7 +200,9 @@ final class RecordingService: NSObject, RecordingServiceProtocol {
 
     func skip(by delta: TimeInterval) throws {
         let t = try currentPlaybackTime()
-        try seek(to: t + delta)
+        let d = try duration()
+        let target = max(0, min(d, t + delta))
+        try seek(to: target)
     }
 
     func setPlaybackRate(_ rate: Float) throws {
