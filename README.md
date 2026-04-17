@@ -28,19 +28,6 @@
 - Прогресс AI-этапов в UI (`loading models`, `preprocessing`, `transcribing`, `summarizing`, `done/error`).
 - Локализация интерфейса: `ru` и `en`.
 
-## Текущий стек
-
-- Язык: `Swift 5`.
-- UI: `SwiftUI` в `UIHostingController` + `UINavigationController` (не чистый UIKit).
-- Аудио: `AVFoundation`.
-- AI:
-  - `WhisperKit` (`0.15.0`) для распознавания;
-  - `LlamaSwift` из `llama.swift` (`2.7642.0`) для summary.
-- Хранение:
-  - аудио: `Documents/Recordings`;
-  - metadata JSON: `Documents/RecordingMetadata`.
-- Тесты: Swift Testing (`import Testing`) в `voice_record_itmoTests`.
-
 ## Архитектура (по текущим файлам)
 
 - `AppDelegate` поднимает `UINavigationController` и `Main` экран.
@@ -82,8 +69,3 @@
 3. Выбрать target `voice_record_itmo` и реальное iOS-устройство.
 4. Запустить приложение.
 5. При первом старте дать доступ к микрофону.
-
-## Что важно знать
-
-- `README` раньше описывал старую версию (NaturalLanguage/RecordViewController), сейчас это не соответствует коду.
-- Суммаризация выполняется не через `NaturalLanguage`, а через локальную Qwen-модель.
