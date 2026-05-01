@@ -43,6 +43,8 @@ recording.name.placeholder = "Введите название записи";
 transcript.full = "Полная расшифровка";
 summary.title = "Сводка";
 ai.summary = "AI-сводка";
+summary.mode.essence = "Суть 2-3 предложения";
+summary.mode.bullet_points = "6-7 пунктов";
 copy = "Копировать";
 keywords = "Ключевые слова";
 

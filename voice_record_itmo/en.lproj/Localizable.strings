@@ -43,6 +43,8 @@ recording.name.placeholder = "Enter recording name";
 transcript.full = "Full Transcript";
 summary.title = "Summary";
 ai.summary = "AI Summary";
+summary.mode.essence = "Essence, 2-3 sentences";
+summary.mode.bullet_points = "6-7 bullet points";
 copy = "Copy";
 keywords = "Key words";
 

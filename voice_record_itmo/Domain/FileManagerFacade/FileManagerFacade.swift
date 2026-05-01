@@ -153,6 +153,8 @@ final class FileManagerFacade: FileManagerFacadeProtocol {
                 playbackRate: m.playbackRate,
                 transcript: m.transcript,
                 summary: m.summary,
+                summaryEssence: m.summaryEssence,
+                summaryBulletPoints: m.summaryBulletPoints,
                 keywords: m.keywords,
                 neuralStatus: m.neuralStatus,
                 neuralErrorMessage: m.neuralErrorMessage,

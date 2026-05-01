@@ -290,7 +290,7 @@ final class MainViewModel: ObservableObject {
 
     /// “Умный” поиск:
     /// - разбивает ввод на слова (токены)
-    /// - ищет по title / transcript / summary
+    /// - ищет по title / transcript / summary / двум вариантам сводки
     /// - запись подходит, если ВСЕ токены найдены хотя бы в одном из полей (AND)
     private func smartSearch(text: String) -> [RecordingViewItem] {
         let tokens = tokenize(text)
@@ -300,7 +300,11 @@ final class MainViewModel: ObservableObject {
         let matchedBundles: [RecordingBundle] = bundles.filter { b in
             let title = normalize(b.title)
             let transcript = normalize(b.metadata?.transcript ?? "")
-            let summary = normalize(b.metadata?.summary ?? "")
+            let summary = normalize([
+                b.metadata?.summary,
+                b.metadata?.summaryEssence,
+                b.metadata?.summaryBulletPoints
+            ].compactMap { $0 }.joined(separator: " "))
 
             return tokens.allSatisfy { t in
                 title.contains(t) || transcript.contains(t) || summary.contains(t)
@@ -347,7 +351,11 @@ final class MainViewModel: ObservableObject {
         }()
 
         let isTranscribed = (b.metadata?.transcript?.isEmpty == false)
-        let isSummurized = (b.metadata?.summary?.isEmpty == false)
+        let isSummurized = [
+            b.metadata?.summary,
+            b.metadata?.summaryEssence,
+            b.metadata?.summaryBulletPoints
+        ].contains { $0?.isEmpty == false }
 
         return RecordingViewItem(
             id: id,
@@ -443,6 +451,8 @@ final class MainViewModel: ObservableObject {
             playbackRate: m.playbackRate,
             transcript: m.transcript,
             summary: m.summary,
+            summaryEssence: m.summaryEssence,
+            summaryBulletPoints: m.summaryBulletPoints,
             keywords: m.keywords,
             neuralStatus: m.neuralStatus,
             neuralErrorMessage: m.neuralErrorMessage,
@@ -474,6 +484,8 @@ final class MainViewModel: ObservableObject {
             playbackRate: 1.0,
             transcript: bundle.metadata?.transcript,
             summary: bundle.metadata?.summary,
+            summaryEssence: bundle.metadata?.summaryEssence,
+            summaryBulletPoints: bundle.metadata?.summaryBulletPoints,
             keywords: bundle.metadata?.keywords ?? [],
             neuralStatus: .idle,
             neuralErrorMessage: nil,
@@ -498,6 +510,8 @@ final class MainViewModel: ObservableObject {
             playbackRate: m.playbackRate,
             transcript: m.transcript,
             summary: m.summary,
+            summaryEssence: m.summaryEssence,
+            summaryBulletPoints: m.summaryBulletPoints,
             keywords: m.keywords,
             neuralStatus: m.neuralStatus,
             neuralErrorMessage: m.neuralErrorMessage,

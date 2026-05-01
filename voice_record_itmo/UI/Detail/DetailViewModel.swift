@@ -18,12 +18,19 @@ final class DetailViewModel: ObservableObject {
     @Published var playback: PlaybackState = PlaybackState()
     @Published var transcript: String = ""
     @Published var summary: AISummary = AISummary()
+    @Published var summaryMode: SummaryMode = .essence {
+        didSet {
+            updateDisplayedSummary()
+        }
+    }
     @Published var currentStatusProgress: Double = .zero
     @Published var isAiActionEnabled: Bool = false
     @Published var isDeleteAlertPresented: Bool = false
     @Published var isSummaryMissingAlertPresented: Bool = false
     @Published var isShareSheetPresented: Bool = false
     @Published var shareText: String = ""
+    @Published var isTitleEditing: Bool = false
+    @Published var titleDraft: String = ""
     
     private weak var router: Router?
     
@@ -33,6 +40,8 @@ final class DetailViewModel: ObservableObject {
     private let itemId: String
     private var bundle: RecordingBundle?
     private var metadata: RecordingMetadata?
+    private var summaryEssence: String = ""
+    private var summaryBulletPoints: String = ""
     
     private let calendar: Calendar
     private var timer: Timer?
@@ -60,17 +69,25 @@ final class DetailViewModel: ObservableObject {
     func onGetTranscriptionAndSummarizationTap() {
         if let audio = bundle?.audio.audioURL {
             Task { [weak self] in
+                guard let self else { return }
                 do {
-                    let result = try await AiFacade.shared.transcribeAndSummarize(
-                        audioURL: audio
-                    )
-                    
-                    self?.transcript = result.transcript
-                    self?.summary = AISummary(
-                        text: result.summary,
-                        keyWords: [] // если позже добавишь keywords из LLM
-                    )
-                    self?.saveSummaryIfPossible()
+                    let existingTranscript = self.transcript.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if existingTranscript.isEmpty {
+                        let result = try await AiFacade.shared.transcribeAndSummarizeAll(
+                            audioURL: audio
+                        )
+
+                        self.transcript = result.transcript
+                        self.summaryEssence = result.essence
+                        self.summaryBulletPoints = result.bulletPoints
+                    } else {
+                        let summaries = try await AiFacade.shared.summarizeAll(text: existingTranscript)
+                        self.summaryEssence = summaries.essence
+                        self.summaryBulletPoints = summaries.bulletPoints
+                    }
+
+                    self.updateDisplayedSummary()
+                    self.saveSummaryIfPossible()
                 } catch {
                     // Статус ошибки приходит из общего AiFacade.progressSubject.
                 }
@@ -85,6 +102,7 @@ final class DetailViewModel: ObservableObject {
     
     func onDisappear() {
         if !isDeleted {
+            saveTitleIfEditing()
             saveProgressIfPossible()
         }
         stopTimer()
@@ -93,6 +111,7 @@ final class DetailViewModel: ObservableObject {
     }
     
     func onGoBack() {
+        saveTitleIfEditing()
         saveProgressIfPossible()
         stopTimer()
         try? player.stopPlayback()
@@ -125,12 +144,12 @@ final class DetailViewModel: ObservableObject {
             self.metadata = b.metadata
             
             playback.title = b.title
+            titleDraft = b.title
             playback.dateLine = makeDateLine(for: b.audio.createdAt, duration: b.metadata?.durationSec)
             transcript = b.metadata?.transcript ?? ""
-            summary = AISummary(
-                text: b.metadata?.summary ?? "",
-                keyWords: b.metadata?.keywords ?? []
-            )
+            summaryEssence = b.metadata?.summaryEssence ?? ""
+            summaryBulletPoints = b.metadata?.summaryBulletPoints ?? b.metadata?.summary ?? ""
+            updateDisplayedSummary(keyWords: b.metadata?.keywords ?? [])
             
             playback.speed = Double(b.metadata?.playbackRate ?? 1.0)
             
@@ -292,9 +311,29 @@ final class DetailViewModel: ObservableObject {
     }
     
     // MARK: - Tabs
+
+    func onTitleTap() {
+        titleDraft = playback.title
+        isTitleEditing = true
+    }
+
+    func onTitleSubmit() {
+        saveTitleIfEditing()
+    }
+
+    func onTitleEditingChanged(_ isEditing: Bool) {
+        if !isEditing {
+            saveTitleIfEditing()
+        }
+    }
     
     func onTagTap(tab: SummaryTab) {
         self.tab = tab
+        updateDisplayedSummary()
+    }
+
+    func onSummaryModeChange(_ mode: SummaryMode) {
+        summaryMode = mode
     }
     
     // MARK: - Copy
@@ -425,6 +464,8 @@ final class DetailViewModel: ObservableObject {
             playbackRate: Float(playback.speed),
             transcript: m.transcript,
             summary: m.summary,
+            summaryEssence: m.summaryEssence,
+            summaryBulletPoints: m.summaryBulletPoints,
             keywords: m.keywords,
             neuralStatus: m.neuralStatus,
             neuralErrorMessage: m.neuralErrorMessage,
@@ -456,6 +497,8 @@ final class DetailViewModel: ObservableObject {
             playbackRate: Float(playback.speed),
             transcript: m.transcript,
             summary: m.summary,
+            summaryEssence: m.summaryEssence,
+            summaryBulletPoints: m.summaryBulletPoints,
             keywords: m.keywords,
             neuralStatus: m.neuralStatus,
             neuralErrorMessage: m.neuralErrorMessage,
@@ -486,7 +529,9 @@ final class DetailViewModel: ObservableObject {
             lastPlaybackPositionSec: m.lastPlaybackPositionSec,
             playbackRate: Float(playback.speed),
             transcript: transcript,
-            summary: summary.text,
+            summary: summaryBulletPoints.isEmpty ? summaryEssence : summaryBulletPoints,
+            summaryEssence: summaryEssence,
+            summaryBulletPoints: summaryBulletPoints,
             keywords: summary.keyWords,
             neuralStatus: m.neuralStatus,
             neuralErrorMessage: m.neuralErrorMessage,
@@ -498,6 +543,65 @@ final class DetailViewModel: ObservableObject {
             try facade.updateMetadata(m)
             metadata = m
         } catch { }
+    }
+
+    private func saveTitleIfEditing() {
+        guard isTitleEditing else { return }
+        isTitleEditing = false
+        saveTitleIfPossible()
+    }
+
+    private func saveTitleIfPossible() {
+        let trimmed = titleDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            titleDraft = playback.title
+            return
+        }
+
+        guard trimmed != playback.title else {
+            titleDraft = playback.title
+            return
+        }
+
+        guard var m = metadata else {
+            playback.title = trimmed
+            titleDraft = trimmed
+            return
+        }
+
+        m = RecordingMetadata(
+            id: m.id,
+            title: trimmed,
+            note: m.note,
+            isStarred: m.isStarred,
+            createdAt: m.createdAt,
+            updatedAt: Date(),
+            relativePath: m.relativePath,
+            fileExt: m.fileExt,
+            fileSizeBytes: m.fileSizeBytes,
+            durationSec: m.durationSec,
+            lastPlaybackPositionSec: m.lastPlaybackPositionSec,
+            playbackRate: m.playbackRate,
+            transcript: m.transcript,
+            summary: m.summary,
+            summaryEssence: m.summaryEssence,
+            summaryBulletPoints: m.summaryBulletPoints,
+            keywords: m.keywords,
+            neuralStatus: m.neuralStatus,
+            neuralErrorMessage: m.neuralErrorMessage,
+            modelName: m.modelName,
+            modelVersion: m.modelVersion
+        )
+
+        do {
+            try facade.updateMetadata(m)
+            metadata = m
+            playback.title = trimmed
+            titleDraft = trimmed
+            NotificationCenter.default.post(name: .recordingsDidChange, object: nil)
+        } catch {
+            titleDraft = playback.title
+        }
     }
 
     private func deleteCurrentRecording() {
@@ -516,6 +620,35 @@ final class DetailViewModel: ObservableObject {
     }
     
     // MARK: - Helpers
+
+    private func updateDisplayedSummary(keyWords: [String]? = nil) {
+        let selectedText = text(for: summaryMode)
+        let fallbackText = text(for: fallbackMode(for: summaryMode))
+        let text = selectedText.isEmpty ? fallbackText : selectedText
+
+        summary = AISummary(
+            text: text,
+            keyWords: keyWords ?? summary.keyWords
+        )
+    }
+
+    private func text(for mode: SummaryMode) -> String {
+        switch mode {
+        case .essence:
+            return summaryEssence
+        case .bulletPoints:
+            return summaryBulletPoints
+        }
+    }
+
+    private func fallbackMode(for mode: SummaryMode) -> SummaryMode {
+        switch mode {
+        case .essence:
+            return .bulletPoints
+        case .bulletPoints:
+            return .essence
+        }
+    }
     
     private func nextValue(in options: [Double], current: Double) -> Double {
         if let idx = options.firstIndex(where: { abs($0 - current) < 0.001 }) {

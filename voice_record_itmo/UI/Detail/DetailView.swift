@@ -12,6 +12,7 @@ import UIKit
 
 struct DetailView: View {
     @StateObject var viewModel: DetailViewModel
+    @FocusState private var isTitleFocused: Bool
     
     var body: some View {
         VStack(spacing: .zero) {
@@ -53,6 +54,12 @@ struct DetailView: View {
         .sheet(isPresented: $viewModel.isShareSheetPresented) {
             ActivityViewController(activityItems: [viewModel.shareText])
         }
+        .onChange(of: viewModel.isTitleEditing) { _, isEditing in
+            isTitleFocused = isEditing
+        }
+        .onChange(of: isTitleFocused) { _, isFocused in
+            viewModel.onTitleEditingChanged(isFocused)
+        }
     }
     
     private var header: some View {
@@ -76,9 +83,30 @@ struct DetailView: View {
                 CircleIconButton(systemImage: "square.and.arrow.up") { viewModel.onShareTap() }
             }
             
-            Text(viewModel.playback.title)
-                .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(Color(.label))
+            Group {
+                if viewModel.isTitleEditing {
+                    TextField("", text: $viewModel.titleDraft)
+                        .focused($isTitleFocused)
+                        .submitLabel(.done)
+                        .onSubmit {
+                            viewModel.onTitleSubmit()
+                        }
+                        .textFieldStyle(.plain)
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(Color(.secondarySystemBackground))
+                        )
+                } else {
+                    Text(viewModel.playback.title)
+                        .onTapGesture {
+                            viewModel.onTitleTap()
+                        }
+                }
+            }
+            .font(.system(size: 28, weight: .semibold))
+            .foregroundStyle(Color(.label))
             
             Text(viewModel.playback.dateLine)
                 .font(.system(size: 18, weight: .regular))
@@ -245,6 +273,13 @@ struct DetailView: View {
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(Color(.systemBlue))
             }
+
+            Picker("", selection: $viewModel.summaryMode) {
+                ForEach(SummaryMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
             
             Text(viewModel.summary.text)
                 .font(.system(size: 18))

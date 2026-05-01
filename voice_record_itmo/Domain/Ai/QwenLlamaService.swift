@@ -85,6 +85,7 @@ actor QwenLlamaService {
 
     func summarize(
         text: String,
+        mode: SummaryMode = .bulletPoints,
         deliverOnMainActor: Bool = true,
         progress: LlamaProgressHandler? = nil
     ) async throws -> String {
@@ -104,11 +105,11 @@ actor QwenLlamaService {
         defer { llama_free(ctx) }
 
         let system = """
-        Ты помощник по суммаризации.
+        Ты помощник по сокращению текста.
         Всегда отвечай только на русском языке. Тебе дадут транскрибацию речи. В ней могут быть опечатки. Исправь опечатки и далее выполни задание.
         """
         let user = """
-        Суммаризируй текст в нескольких кратких пунктах, без воды.
+        \(mode.userPromptInstruction)
 
         Текст:
         \(text)

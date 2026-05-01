@@ -46,6 +46,8 @@ enum L10n {
     case transcriptFull
     case summaryTitle
     case aiSummary
+    case summaryModeEssence
+    case summaryModeBulletPoints
     case copy
     case keywords
 
@@ -123,6 +125,8 @@ enum L10n {
         case .transcriptFull: return "transcript.full"
         case .summaryTitle: return "summary.title"
         case .aiSummary: return "ai.summary"
+        case .summaryModeEssence: return "summary.mode.essence"
+        case .summaryModeBulletPoints: return "summary.mode.bullet_points"
         case .copy: return "copy"
         case .keywords: return "keywords"
 
