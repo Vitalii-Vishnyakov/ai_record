@@ -1,0 +1,126 @@
+@startuml local_storage_er
+title ER-диаграмма локального хранения данных на устройстве
+
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam entity {
+  BackgroundColor #FFFFFF
+  BorderColor #2F3A45
+  FontColor #1F2933
+}
+
+entity "Documents" as Documents {
+  * appDocumentsUrl : URL <<directory>>
+}
+
+entity "Recordings" as RecordingsDir {
+  * path : String <<directory>>
+  --
+  defaultName : "Recordings"
+}
+
+entity "RecordingMetadata" as MetadataDir {
+  * path : String <<directory>>
+  --
+  defaultName : "RecordingMetadata"
+}
+
+entity "AudioFile" as AudioFile {
+  * fileName : String <<PK>>
+  --
+  id : String
+  fileURL : URL
+  fileExt : String
+  createdAt : Date
+  sizeBytes : Int64
+  allowedExtensions : m4a|wav|caf|aac|mp3
+}
+
+entity "MetadataEnvelope" as MetadataEnvelope {
+  * fileName : String <<PK>>
+  --
+  schemaVersion : Int
+  savedAt : Date
+}
+
+entity "RecordingMetadata" as RecordingMetadata {
+  * id : UUID <<PK>>
+  --
+  title : String
+  note : String?
+  isStarred : Bool
+  createdAt : Date
+  updatedAt : Date
+  relativePath : String <<FK to AudioFile.fileName>>
+  fileExt : String
+  fileSizeBytes : Int64
+  durationSec : Double
+  lastPlaybackPositionSec : Double
+  playbackRate : Float
+  transcript : String?
+  summary : String?
+  summaryEssence : String?
+  summaryBulletPoints : String?
+  neuralStatus : NeuralStatus
+  neuralErrorMessage : String?
+  modelName : String?
+  modelVersion : String?
+}
+
+entity "Keyword" as Keyword {
+  * value : String <<array item>>
+}
+
+entity "NeuralStatus" as NeuralStatus {
+  * rawValue : Int16 <<enum>>
+  --
+  idle = 0
+  warmingUp = 1
+  loadingModel = 2
+  processingAudio = 3
+  transcribing = 4
+  summarizing = 5
+  extractingKeywords = 6
+  done = 7
+  error = 8
+}
+
+entity "RecordingBundle" as RecordingBundle {
+  * id : String <<derived>>
+  --
+  title : String <<derived>>
+  isStarred : Bool <<derived>>
+  durationSec : Double? <<derived>>
+}
+
+Documents ||--|| RecordingsDir : contains
+Documents ||--|| MetadataDir : contains
+RecordingsDir ||--o{ AudioFile : stores
+MetadataDir ||--o{ MetadataEnvelope : stores JSON
+
+MetadataEnvelope ||--|| RecordingMetadata : payload
+RecordingMetadata }o--|| AudioFile : "relativePath -> fileName"
+RecordingMetadata ||--o{ Keyword : keywords[]
+RecordingMetadata }o--|| NeuralStatus : status
+
+RecordingBundle }o..|| AudioFile : audio
+RecordingBundle }o..o| RecordingMetadata : metadata
+
+note right of MetadataEnvelope
+  JSON file name:
+  {recordingMetadata.id}.json
+end note
+
+note bottom of RecordingMetadata
+  Metadata is persisted as Codable JSON inside MetadataEnvelope.
+  The audio relation is resolved by matching relativePath lastPathComponent
+  with the audio file name in Documents/Recordings.
+end note
+
+note bottom of RecordingBundle
+  Runtime view model from FileManagerFacade.
+  It is not persisted as a separate device-storage entity.
+end note
+
+@enduml

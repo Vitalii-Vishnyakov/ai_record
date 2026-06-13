@@ -4,6 +4,8 @@
 
 Состояние `README` актуально для текущего кода в репозитории.
 
+Архив со всеми моделями, чтобы просто собраться в один клик https://drive.google.com/file/d/1QjVGmIZNmnkrdRW1-hx9Df5KSJwc9NIn/view?usp=sharing
+
 ## Что есть сейчас
 
 - Запись аудио (`AVAudioRecorder`) с паузой/продолжением.
@@ -41,6 +43,10 @@
   - `MetaDataFileManager` — JSON metadata;
   - `FileManagerFacade` — склейка audio + metadata;
   - `AiFacade` + `WhisperService` + `QwenLlamaService`.
+
+## Диаграммы
+
+- ER-диаграмма локального хранения данных на устройстве: `docs/local_storage_er.puml`.
 
 ## Локальные модели и ресурсы
 
